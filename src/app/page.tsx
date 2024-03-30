@@ -1,10 +1,16 @@
 'use client';
 
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import CSVReader from 'react-csv-reader';
 
 export default function Home() {
+  const [position, setPosition] = useState({
+    startLine: 5,
+    idColumn: 0,
+    patientColumn: 2,
+    staffColumn: 5,
+  });
   const [csvData, setCsvData] = useState<any>([]);
   const [formData, setFormData] = useState({
     patientId: '',
@@ -14,10 +20,16 @@ export default function Home() {
     treatmentType: '',
   });
 
-  const handleCsvData = (data: any) => {
-    const processedData = data.slice(4).map((row: any) => [row[0], row[2], row[5]]);
-    setCsvData(processedData);
-  };
+  const handleCsvData = useCallback(
+    (data: any) => {
+      setCsvData([]);
+      const processedData = data
+        .slice(position.startLine - 1)
+        .map((row: any) => [row[position.idColumn], row[position.patientColumn], row[position.staffColumn]]);
+      setCsvData(processedData);
+    },
+    [position]
+  );
 
   const handleFormSubmit = (event: any) => {
     event.preventDefault();
@@ -57,12 +69,11 @@ export default function Home() {
     const patientId: string = data[0];
     const patientName: string = data[1];
     const staffName: string = data[2];
-    const procedureDate = new Date();
+    const procedureDate = new Date(formData.procedureDate);
     const today = procedureDate.toLocaleDateString('pt-br', {
       dateStyle: 'short',
+      timeZone: 'UTC',
     });
-
-    console.log(formData);
 
     // Preencher página 1
     pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
@@ -88,6 +99,14 @@ export default function Home() {
   };
 
   const fillPDF = async () => {
+    if (!formData.treatmentType) {
+      alert('Selecione um tratamento');
+      return;
+    }
+    if (!formData.procedureDate) {
+      alert('Selecione uma data');
+      return;
+    }
     const pdfDoc = await PDFDocument.create();
     for (let i = 0; i < csvData.length; i++) {
       const data = csvData[i];
@@ -172,6 +191,60 @@ export default function Home() {
               Eylia
             </option>
           </select>
+        </div>
+        <div className="flex">
+          <input
+            type="number"
+            className="input input-bordered input-xs"
+            placeholder="Linha inicial"
+            defaultValue={5}
+            onChange={(e) =>
+              setPosition({
+                ...position,
+                startLine: parseInt(e.target.value),
+              })
+            }
+            value={position.startLine}
+          />
+          <input
+            type="number"
+            className="input input-bordered input-xs"
+            placeholder="Coluna ID"
+            defaultValue={0}
+            onChange={(e) =>
+              setPosition({
+                ...position,
+                idColumn: parseInt(e.target.value),
+              })
+            }
+            value={position.idColumn}
+          />
+          <input
+            type="number"
+            className="input input-bordered input-xs"
+            placeholder="Coluna Nome"
+            defaultValue={2}
+            onChange={(e) =>
+              setPosition({
+                ...position,
+                patientColumn: parseInt(e.target.value),
+              })
+            }
+            value={position.patientColumn}
+          />
+          <input
+            type="number"
+            className="input input-bordered input-xs"
+            placeholder="Coluna Staff"
+            defaultValue={5}
+            onChange={(e) =>
+              setPosition({
+                ...position,
+                staffColumn: parseInt(e.target.value),
+              })
+            }
+            value={position.staffColumn}
+          />
         </div>
         <div className="form-control">
           <CSVReader
