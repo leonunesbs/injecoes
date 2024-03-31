@@ -69,8 +69,8 @@ export function FillPdf({ queuedData }: FillPdfProps) {
   };
 
   return (
-    <button onClick={fillPDF} className="btn btn-primary" disabled={!queuedData.length}>
-      3. Preencher e Converter PDF
+    <button onClick={fillPDF} type="button" className="btn btn-secondary join-item" disabled={!queuedData.length}>
+      Preencher e Converter PDF
     </button>
   );
 }
