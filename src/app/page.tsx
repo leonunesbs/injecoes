@@ -1,8 +1,18 @@
 'use client';
 
-import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { useCallback, useState } from 'react';
 import CSVReader from 'react-csv-reader';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
+import { AdvancedConfig, FillPdf } from '@/components';
+
+export interface Data {
+  patientId: string;
+  patientName: string;
+  staffName: string;
+  procedureDate: string;
+  treatmentType: string;
+}
 
 export default function Home() {
   const [position, setPosition] = useState({
@@ -11,271 +21,155 @@ export default function Home() {
     patientColumn: 2,
     staffColumn: 5,
   });
-  const [csvData, setCsvData] = useState<any>([]);
-  const [formData, setFormData] = useState({
-    patientId: '',
-    patientName: '',
-    staffName: '',
-    procedureDate: '',
-    treatmentType: '',
+  const [queuedData, setQueuedData] = useState<Data[]>([]);
+  const { register, handleSubmit, getValues, reset } = useForm<{
+    patientId: string;
+    patientName: string;
+    staffName: string;
+    procedureDate: string;
+    treatmentType: string;
+  }>({
+    defaultValues: {
+      procedureDate: new Date().toISOString().split('T')[0],
+      treatmentType: 'INJEÇÃO INTRAVÍTREA DE AVASTIN',
+    },
   });
 
   const handleCsvData = useCallback(
     (data: any) => {
-      setCsvData([]);
-      const processedData = data
-        .slice(position.startLine - 1)
-        .map((row: any) => [row[position.idColumn], row[position.patientColumn], row[position.staffColumn]]);
-      setCsvData(processedData);
+      const processedData = data.slice(position.startLine - 1).map((row: any) => ({
+        patientId: row[position.idColumn],
+        patientName: row[position.patientColumn],
+        staffName: row[position.staffColumn],
+        procedureDate: getValues('procedureDate'),
+        treatmentType: getValues('treatmentType'),
+      }));
+      setQueuedData(processedData);
     },
-    [position]
+    [position, getValues]
   );
 
-  const handleFormSubmit = (event: any) => {
-    event.preventDefault();
-    const newEntry = [
-      formData.patientId,
-      formData.patientName.toUpperCase(),
-      formData.staffName.toUpperCase(),
-      formData.procedureDate,
-      formData.treatmentType,
-    ];
-    setCsvData([...csvData, newEntry]);
-  };
-
-  const handleInputChange = (event: any) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const fillPdfTemplateWithData = async (data: any) => {
-    const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
-    const pdfDoc = await PDFDocument.load(modelPDFBytes);
-    const pages = pdfDoc.getPages();
-    const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-
-    pages[0].setFontSize(10);
-    pages[0].setFont(timesRomanFont);
-
-    pages[1].setFontSize(10);
-    pages[1].setFont(timesRomanFont);
-
-    pages[2].setFontSize(10);
-    pages[2].setFont(timesRomanFont);
-
-    const patientId: string = data[0];
-    const patientName: string = data[1];
-    const staffName: string = data[2];
-    const procedureDate = new Date(formData.procedureDate);
-    const today = procedureDate.toLocaleDateString('pt-br', {
-      dateStyle: 'short',
-      timeZone: 'UTC',
-    });
-
-    // Preencher página 1
-    pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
-    pages[0].drawText(patientId, { x: 475, y: 633 });
-    pages[0].drawText(today, { x: 53, y: 483 });
-    pages[0].drawText(today, { x: 215, y: 483 });
-    pages[0].drawText(today, { x: 60, y: 110 });
-    pages[0].drawText(formData.treatmentType, { x: 50, y: 300 });
-
-    // Preencher página 2
-    pages[1].drawText(patientName.toUpperCase(), { x: 100, y: 705 });
-    pages[1].drawText(patientId, { x: 440, y: 705 });
-    pages[1].drawText(today, { x: 45, y: 670 });
-    pages[1].drawText(staffName.toUpperCase(), { x: 75, y: 640 });
-
-    // Preencher página 3
-    pages[2].drawText(patientName.toUpperCase(), { x: 75, y: 330 });
-    pages[2].drawText(today, { x: 345, y: 330 });
-    pages[2].drawText(patientName.toUpperCase(), { x: 485, y: 330 });
-    pages[2].drawText(today, { x: 760, y: 330 });
-
-    return await pdfDoc.save();
-  };
-
-  const fillPDF = async () => {
-    if (!formData.treatmentType) {
-      alert('Selecione um tratamento');
-      return;
-    }
-    if (!formData.procedureDate) {
-      alert('Selecione uma data');
-      return;
-    }
-    const pdfDoc = await PDFDocument.create();
-    for (let i = 0; i < csvData.length; i++) {
-      const data = csvData[i];
-      const newPdfBytes = await fillPdfTemplateWithData(data);
-      const newPdfDoc = await PDFDocument.load(newPdfBytes);
-      const copiedPages = await pdfDoc.copyPages(newPdfDoc, [0, 1, 2]);
-      copiedPages.forEach((page) => pdfDoc.addPage(page));
-    }
-
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    window.open(url);
+  const onSubmit: SubmitHandler<{
+    patientId: string;
+    patientName: string;
+    staffName: string;
+    procedureDate: string;
+    treatmentType: string;
+  }> = (data) => {
+    const newEntry: Data = {
+      ...data,
+    };
+    setQueuedData([...queuedData, newEntry]);
+    reset();
   };
 
   return (
     <main className="py-10 px-4 space-y-10">
-      <h1 className="font-bold text-2xl">Injeções</h1>
-      <form onSubmit={handleFormSubmit} className="form-control max-w-md space-y-2">
-        <div className="form-control">
-          <label htmlFor="patientId">Número do prontuário:</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="patientId"
-            name="patientId"
-            className="input input-bordered"
-            placeholder="998877"
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label htmlFor="patientName">Nome do paciente:</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="patientName"
-            name="patientName"
-            className="input input-bordered"
-            placeholder="Fulano de Souza"
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label htmlFor="staffName">Nome do staff:</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="staffName"
-            name="staffName"
-            className="input input-bordered"
-            required
-            placeholder="João da Silva"
-          />
-        </div>
-        <div className="form-control">
-          <label htmlFor="procedureDate">Data do procedimento:</label>
-          <input
-            onChange={handleInputChange}
-            type="date"
-            name="procedureDate"
-            id="procedureDate"
-            className="input input-bordered"
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label htmlFor="treatmentType">Tipo de tratamento:</label>
-          <select
-            className="select select-bordered"
-            onChange={handleInputChange}
-            id="treatmentType"
-            name={'treatmentType'}
-          >
-            <option disabled selected>
-              Selecione uma opção
-            </option>
-            <option id={'treatmentType'} value="INJEÇÃO INTRAVÍTREA DE AVASTIN">
-              Avastin
-            </option>
-            <option id={'treatmentType'} value="INJEÇÃO INTRAVÍTREA DE EYLIA">
-              Eylia
-            </option>
-          </select>
-        </div>
-        <div className="flex">
-          <input
-            type="number"
-            className="input input-bordered input-xs"
-            placeholder="Linha inicial"
-            defaultValue={5}
-            onChange={(e) =>
-              setPosition({
-                ...position,
-                startLine: parseInt(e.target.value),
-              })
-            }
-            value={position.startLine}
-          />
-          <input
-            type="number"
-            className="input input-bordered input-xs"
-            placeholder="Coluna ID"
-            defaultValue={0}
-            onChange={(e) =>
-              setPosition({
-                ...position,
-                idColumn: parseInt(e.target.value),
-              })
-            }
-            value={position.idColumn}
-          />
-          <input
-            type="number"
-            className="input input-bordered input-xs"
-            placeholder="Coluna Nome"
-            defaultValue={2}
-            onChange={(e) =>
-              setPosition({
-                ...position,
-                patientColumn: parseInt(e.target.value),
-              })
-            }
-            value={position.patientColumn}
-          />
-          <input
-            type="number"
-            className="input input-bordered input-xs"
-            placeholder="Coluna Staff"
-            defaultValue={5}
-            onChange={(e) =>
-              setPosition({
-                ...position,
-                staffColumn: parseInt(e.target.value),
-              })
-            }
-            value={position.staffColumn}
-          />
-        </div>
-        <div className="form-control">
-          <CSVReader
-            onFileLoaded={handleCsvData}
-            parserOptions={{ header: false, skipEmptyLines: true }}
-            inputId="csv-reader-input"
-            inputStyle={{ display: 'none' }}
-          />
-          <label htmlFor="csv-reader-input" className="btn btn-primary">
-            Upload CSV
-          </label>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="form-control">
+            <CSVReader
+              onFileLoaded={handleCsvData}
+              parserOptions={{ header: false, skipEmptyLines: true }}
+              inputId="csv-reader-input"
+              inputStyle={{ display: 'none' }}
+            />
+            {!queuedData.length ? (
+              <label htmlFor="csv-reader-input" className="btn btn-primary">
+                1. Upload CSV
+              </label>
+            ) : (
+              <label htmlFor="csv-reader-input" className="btn btn-disabled">
+                Dados carregados
+              </label>
+            )}
+          </div>
+          {queuedData.length > 0 && (
+            <div className="overflow-x-auto max-h-96">
+              <table className="table bg-base-200">
+                <thead>
+                  <tr>
+                    <th>N prontuário</th>
+                    <th>Nome do paciente</th>
+                    <th>Nome do staff</th>
+                    <th>Data do procedimento</th>
+                    <th>Tipo de tratamento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {queuedData.map(({ patientId, patientName, staffName, procedureDate, treatmentType }) => (
+                    <tr key={patientId}>
+                      <td>{patientId}</td>
+                      <td>{patientName}</td>
+                      <td>{staffName}</td>
+                      <td>{procedureDate}</td>
+                      <td>{treatmentType}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
         <div>
-          <button type="submit" className="btn btn-primary">
-            Adicionar
-          </button>
+          <h1 className="font-bold text-2xl">Injeções</h1>
+          <form onSubmit={handleSubmit(onSubmit)} className="form-control max-w-md space-y-2">
+            <div className="form-control">
+              <label htmlFor="patientId">Número do prontuário:</label>
+              <input
+                {...register('patientId')}
+                type="text"
+                id="patientId"
+                name="patientId"
+                className="input input-bordered"
+                placeholder="998877"
+                required
+              />
+            </div>
+            <div className="form-control">
+              <label htmlFor="patientName">Nome do paciente:</label>
+              <input
+                {...register('patientName')}
+                type="text"
+                className="input input-bordered"
+                placeholder="Fulano de Souza"
+                required
+              />
+            </div>
+            <div className="form-control">
+              <label htmlFor="staffName">Nome do staff:</label>
+              <input
+                {...register('staffName')}
+                type="text"
+                id="staffName"
+                name="staffName"
+                className="input input-bordered"
+                required
+                placeholder="João da Silva"
+              />
+            </div>
+            <div className="form-control">
+              <label htmlFor="procedureDate">Data do procedimento:</label>
+              <input {...register('procedureDate')} type="date" className="input input-bordered" required />
+            </div>
+            <div className="form-control">
+              <label htmlFor="treatmentType">Tipo de tratamento:</label>
+              <select className="select select-bordered" {...register('treatmentType')}>
+                <option value="INJEÇÃO INTRAVÍTREA DE AVASTIN">Avastin</option>
+                <option value="INJEÇÃO INTRAVÍTREA DE EYLIA">Eylia</option>
+              </select>
+            </div>
+            <AdvancedConfig position={position} setPosition={setPosition} />
+
+            <div>
+              <button type="submit" className="btn btn-primary">
+                2. Adicionar
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
-      {csvData.length > 0 && (
-        <div>
-          <h2 className="font-bold text-xl">Dados do CSV:</h2>
-          <ul>
-            {csvData.map((row: any, index: any) => (
-              <li key={index}>{row.join(', ')}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <button onClick={fillPDF} className="btn btn-primary">
-        Preencher e Converter PDF
-      </button>
+      </div>
+      <FillPdf queuedData={queuedData} />
     </main>
   );
 }
