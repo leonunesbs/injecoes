@@ -16,7 +16,7 @@ export interface Data {
 
 export default function Home() {
   const [position, setPosition] = useState({
-    startLine: 5,
+    startLine: 4,
     idColumn: 0,
     patientColumn: 2,
     staffColumn: 5,
@@ -37,7 +37,7 @@ export default function Home() {
 
   const handleCsvData = useCallback(
     (data: any) => {
-      const processedData = data.slice(position.startLine - 1).map((row: any) => ({
+      const processedData = data.slice(position.startLine).map((row: any) => ({
         patientId: row[position.idColumn],
         patientName: row[position.patientColumn],
         staffName: row[position.staffColumn],
