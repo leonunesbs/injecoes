@@ -19,7 +19,6 @@ export default function Home() {
     <main className="py-10 px-4 space-y-10 w-full">
       <div className="flex gap-4">
         <div className="min-w-96 space-y-4">
-          <h1 className="font-bold text-2xl">Injeções</h1>
           <QueueForm queuedData={queuedData} setQueuedData={setQueuedData} />
         </div>
         <QueueTable queuedData={queuedData} />
