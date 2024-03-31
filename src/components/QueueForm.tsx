@@ -61,7 +61,8 @@ export function QueueForm({ queuedData, setQueuedData }: QueueFormProps) {
 
   return (
     <>
-      <div className="form-control">
+      <div className="form-control space-y-2">
+        <AdvancedConfig position={position} setPosition={setPosition} />
         <CSVReader
           onFileLoaded={handleCsvData}
           parserOptions={{ header: false, skipEmptyLines: true }}
@@ -78,6 +79,7 @@ export function QueueForm({ queuedData, setQueuedData }: QueueFormProps) {
           </label>
         )}
       </div>
+
       <form onSubmit={handleSubmit(onSubmit)} className="form-control max-w-md space-y-2">
         <div className="form-control">
           <label htmlFor="patientId">Número do prontuário:</label>
@@ -124,7 +126,6 @@ export function QueueForm({ queuedData, setQueuedData }: QueueFormProps) {
             <option value="INJEÇÃO INTRAVÍTREA DE EYLIA">Eylia</option>
           </select>
         </div>
-        <AdvancedConfig position={position} setPosition={setPosition} />
 
         <div className="join">
           <button type="submit" className="btn btn-primary join-item">
