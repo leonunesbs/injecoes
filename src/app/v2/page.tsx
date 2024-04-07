@@ -39,7 +39,7 @@ export default function V2() {
         patientId: row[0],
         patientName: row[2],
         staffName: row[5],
-        procedureDate: row[7].split(' ')[0],
+        procedureDate: row[7],
         treatmentType: row[10],
       }));
 
@@ -64,31 +64,25 @@ export default function V2() {
       pages[2].setFontSize(10);
       pages[2].setFont(timesRomanFont);
 
-      const date = new Date(procedureDate);
-      const today = date.toLocaleDateString('pt-br', {
-        dateStyle: 'short',
-        timeZone: 'UTC',
-      });
-
       // Preencher página 1
       pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
       pages[0].drawText(patientId, { x: 475, y: 633 });
-      pages[0].drawText(today, { x: 53, y: 483 });
-      pages[0].drawText(today, { x: 215, y: 483 });
-      pages[0].drawText(today, { x: 60, y: 110 });
+      pages[0].drawText(procedureDate.split(' ')[0], { x: 53, y: 483 });
+      pages[0].drawText(procedureDate.split(' ')[0], { x: 215, y: 483 });
+      pages[0].drawText(procedureDate.split(' ')[0], { x: 60, y: 110 });
       pages[0].drawText(treatmentType, { x: 50, y: 300 });
 
       // Preencher página 2
       pages[1].drawText(patientName.toUpperCase(), { x: 100, y: 705 });
       pages[1].drawText(patientId, { x: 440, y: 705 });
-      pages[1].drawText(today, { x: 45, y: 670 });
+      pages[1].drawText(procedureDate.split(' ')[0], { x: 45, y: 670 });
       pages[1].drawText(staffName.toUpperCase(), { x: 75, y: 640 });
 
       // Preencher página 3
       pages[2].drawText(patientName.toUpperCase(), { x: 75, y: 330 });
-      pages[2].drawText(today, { x: 345, y: 330 });
+      pages[2].drawText(procedureDate.split(' ')[0], { x: 345, y: 330 });
       pages[2].drawText(patientName.toUpperCase(), { x: 485, y: 330 });
-      pages[2].drawText(today, { x: 760, y: 330 });
+      pages[2].drawText(procedureDate.split(' ')[0], { x: 760, y: 330 });
 
       return await pdfDoc.save();
     };
@@ -135,13 +129,12 @@ export default function V2() {
     redirect('/v2/done');
   }
   return (
-    <main className="py-10 px-4 space-y-10 w-full">
+    <main className="py-10 px-4 space-y-10 w-full bg-base-200 min-h-full">
       <section>
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <h1 className="text-2xl mb-6 font-bold">HGF</h1>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-xl font-bold">Processador de dados</h1>
               <form action={action} className="space-y-4">
                 <div className="form-control">
                   <label htmlFor="csvData" className="label label-text">
