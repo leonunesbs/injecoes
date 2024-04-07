@@ -11,6 +11,9 @@ dependencies:
   next:
     specifier: 14.1.2
     version: 14.1.2(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
+  nodemailer:
+    specifier: 6.9.13
+    version: 6.9.13
   pdf-lib:
     specifier: 1.17.1
     version: 1.17.1
@@ -43,6 +46,9 @@ devDependencies:
   '@types/node':
     specifier: 20.11.24
     version: 20.11.24
+  '@types/nodemailer':
+    specifier: 6.4.14
+    version: 6.4.14
   '@types/react':
     specifier: 18.2.63
     version: 18.2.63
@@ -742,6 +748,12 @@ packages:
     resolution: {integrity: sha512-Kza43ewS3xoLgCEpQrsT+xRo/EJej1y0kVYGiLFE1NEODXGzTfwiC6tXTLMQskn1X4/Rjlh0MQUvx9W+L9long==}
     dependencies:
       undici-types: 5.26.5
+    dev: true
+
+  /@types/nodemailer@6.4.14:
+    resolution: {integrity: sha512-fUWthHO9k9DSdPCSPRqcu6TWhYyxTBg382vlNIttSe9M7XfsT06y0f24KHXtbnijPGGRIcVvdKHTNikOI6qiHA==}
+    dependencies:
+      '@types/node': 20.11.24
     dev: true
 
   /@types/normalize-package-data@2.4.1:
@@ -3291,6 +3303,11 @@ packages:
   /node-releases@2.0.14:
     resolution: {integrity: sha512-y10wOWt8yZpqXmOgRo77WaHEmhYQYGNA6y421PKsKYWEK8aW+cqAphborZDhqfyKrbZEN92CN1X2KbafY2s7Yw==}
     dev: true
+
+  /nodemailer@6.9.13:
+    resolution: {integrity: sha512-7o38Yogx6krdoBf3jCAqnIN4oSQFx+fMa0I7dK1D+me9kBxx12D+/33wSb+fhOCtIxvYJ+4x4IMEhmhCKfAiOA==}
+    engines: {node: '>=6.0.0'}
+    dev: false
 
   /normalize-package-data@2.5.0:
     resolution: {integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==}
