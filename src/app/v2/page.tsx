@@ -111,32 +111,6 @@ export default function V2() {
       });
 
       redirect(`?id=${data?.id}`);
-
-      // const transporter = nodemailer.createTransport({
-      //   host: 'smtp.gmail.com',
-      //   port: 465,
-      //   secure: true, // Use `true` for port 465, `false` for all other ports
-      //   auth: {
-      //     user: process.env.SMTP_USER,
-      //     pass: process.env.SMTP_PASS,
-      //   },
-      // });
-
-      // const mailOptions: MailOptions = {
-      //   from: 'oftleonunesbs@gmail.com',
-      //   to: emailTo,
-      //   subject: 'Relatório de Injeções',
-      //   text: 'Segue anexo relatório de injeções.',
-      //   attachments: [
-      //     {
-      //       filename: 'relatorio.pdf',
-      //       content: Buffer.from(pdfBytes),
-      //       contentType: 'application/pdf',
-      //     },
-      //   ],
-      // };
-
-      // transporter.sendMail(mailOptions);
     };
     fillPDF();
   }
