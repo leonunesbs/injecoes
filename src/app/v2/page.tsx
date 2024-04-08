@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import nodemailer from 'nodemailer';
-import { MailOptions } from 'nodemailer/lib/sendmail-transport';
+import { MailOptions } from 'nodemailer/lib/json-transport';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 import { Data } from '../page';
@@ -43,14 +43,10 @@ export default function V2() {
         treatmentType: row[10],
       }));
 
-    const fillPdfTemplateWithData = async ({
-      patientId,
-      patientName,
-      staffName,
-      procedureDate,
-      treatmentType,
-    }: Data) => {
-      const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
+    const fillPdfTemplateWithData = async (
+      { patientId, patientName, staffName, procedureDate, treatmentType }: Data,
+      modelPDFBytes: ArrayBuffer
+    ) => {
       const pdfDoc = await PDFDocument.load(modelPDFBytes);
       const pages = pdfDoc.getPages();
       const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -88,10 +84,11 @@ export default function V2() {
     };
     const fillPDF = async () => {
       const pdfDoc = await PDFDocument.create();
+      const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
       for (let i = 0; i < processedData.length; i++) {
         const data = processedData[i];
         if (!data.patientName) continue;
-        const newPdfBytes = await fillPdfTemplateWithData(data);
+        const newPdfBytes = await fillPdfTemplateWithData(data, modelPDFBytes);
         const newPdfDoc = await PDFDocument.load(newPdfBytes);
         const copiedPages = await pdfDoc.copyPages(newPdfDoc, [0, 1, 2]);
         copiedPages.forEach((page) => pdfDoc.addPage(page));
@@ -129,11 +126,11 @@ export default function V2() {
     fillPDF();
   }
   return (
-    <main className="py-10 px-4 space-y-10 w-full bg-base-200 min-h-full">
+    <main className="py-10 px-4 space-y-10 w-full min-h-full">
       <section>
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <h1 className="text-2xl mb-6 font-bold">HGF</h1>
-          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <form action={action} className="space-y-4">
                 <div className="form-control">
