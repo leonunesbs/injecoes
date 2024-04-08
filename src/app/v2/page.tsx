@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
+import nodemailer from 'nodemailer';
+import { MailOptions } from 'nodemailer/lib/json-transport';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { Resend } from 'resend';
 
 import { Data } from '../page';
 
@@ -97,23 +97,35 @@ export default function V2() {
 
       console.log(pdfBytes);
 
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      console.log(resend);
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // Use `true` for port 465, `false` for all other ports
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
 
-      const { data } = await resend.emails.send({
-        from: 'Acme <onboarding@resend.dev>',
-        to: [emailTo],
+      console.log(transporter);
+
+      const mailOptions: MailOptions = {
+        from: 'oftleonunesbs@gmail.com',
+        to: emailTo,
         subject: 'Relatório de Injeções',
         text: 'Segue anexo relatório de injeções.',
         attachments: [
           {
             filename: 'relatorio.pdf',
             content: Buffer.from(pdfBytes),
+            contentType: 'application/pdf',
           },
         ],
-      });
+      };
+      console.log('teste');
 
-      redirect(`?id=${data?.id}`);
+      const { response } = await transporter.sendMail(mailOptions);
+      console.log(response);
     };
     fillPDF();
   }
