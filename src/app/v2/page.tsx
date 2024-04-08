@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
@@ -120,8 +119,7 @@ export default function V2() {
         ],
       };
 
-      await transporter.sendMail(mailOptions);
-      redirect('/v2/done');
+      transporter.sendMail(mailOptions);
     };
     fillPDF();
   }
