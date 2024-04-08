@@ -95,8 +95,6 @@ export default function V2() {
 
       const pdfBytes = await pdfDoc.save();
 
-      console.log(pdfBytes);
-
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -106,8 +104,6 @@ export default function V2() {
           pass: process.env.SMTP_PASS,
         },
       });
-
-      console.log(transporter);
 
       const mailOptions: MailOptions = {
         from: 'oftleonunesbs@gmail.com',
@@ -122,7 +118,6 @@ export default function V2() {
           },
         ],
       };
-      console.log('teste');
 
       const { response } = await transporter.sendMail(mailOptions);
       console.log(response);
