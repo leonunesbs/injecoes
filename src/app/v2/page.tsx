@@ -124,9 +124,9 @@ export default function V2() {
       };
 
       await transporter.sendMail(mailOptions);
+      redirect('/v2/done');
     };
     fillPDF();
-    redirect('/v2/done');
   }
   return (
     <main className="py-10 px-4 space-y-10 w-full bg-base-200 min-h-full">
