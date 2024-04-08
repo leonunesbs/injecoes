@@ -1,3 +1,3 @@
 export default function Done() {
-  return <>Feito!</>;
+  return <div>Feito!</div>;
 }

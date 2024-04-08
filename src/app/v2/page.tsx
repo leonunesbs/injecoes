@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
@@ -123,6 +124,7 @@ export default function V2() {
       console.log(response);
     };
     fillPDF();
+    redirect('/v2/done');
   }
   return (
     <main className="py-10 px-4 space-y-10 w-full min-h-full">
