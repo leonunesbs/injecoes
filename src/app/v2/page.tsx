@@ -94,7 +94,9 @@ export default function V2() {
       }
 
       const pdfBytes = await pdfDoc.save();
+      console.log(pdfBytes);
       const resend = new Resend(process.env.RESEND_API_KEY);
+      console.log(resend);
       const { data } = await resend.emails.send({
         from: 'Acme <onboarding@resend.dev>',
         to: [emailTo],
