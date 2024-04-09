@@ -94,11 +94,10 @@ export default function V2() {
       }
 
       const pdfBytes = await pdfDoc.save();
-
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
+      const { data } = await resend.emails.send({
         from: 'Acme <onboarding@resend.dev>',
-        to: ['leonunesbs@gmail.com'],
+        to: [emailTo],
         subject: 'Relatório de Injeções',
         text: 'Segue anexo relatório de injeções.',
         attachments: [
@@ -108,6 +107,7 @@ export default function V2() {
           },
         ],
       });
+      console.log(data);
       redirect('/v2/done');
     };
     fillPDF();
@@ -135,7 +135,9 @@ export default function V2() {
                     name="emailTo"
                     id="emailTo"
                     placeholder="john@email.com"
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full input-disabled"
+                    value={'leonunesbs@gmail.com'}
+                    readOnly
                     required
                   />
                 </div>
