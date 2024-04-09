@@ -7,6 +7,7 @@ import { Data } from '../page';
 export default function V2() {
   async function action(data: FormData) {
     'use server';
+    const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
     const csvData = data.get('csvData')?.toString();
     const emailTo = data.get('emailTo')?.toString();
     if (!csvData || !emailTo) {
@@ -83,7 +84,6 @@ export default function V2() {
     };
     const fillPDF = async () => {
       const pdfDoc = await PDFDocument.create();
-      const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
       for (let i = 0; i < processedData.length; i++) {
         const data = processedData[i];
         if (!data.patientName) continue;
@@ -108,9 +108,9 @@ export default function V2() {
           },
         ],
       });
+      redirect('/v2/done');
     };
     fillPDF();
-    redirect('/v2/done');
   }
   return (
     <main className="py-10 px-4 space-y-10 w-full min-h-full">
