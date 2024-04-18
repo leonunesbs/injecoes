@@ -1,3 +1,5 @@
+'use client';
+
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import CSVReader from 'react-csv-reader';
 import { SubmitHandler, useForm } from 'react-hook-form';
