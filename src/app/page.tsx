@@ -63,12 +63,10 @@ export default function Page() {
     return await pdfDoc.save();
   };
 
-  const onSubmit: SubmitHandler<Inputs> = async ({ xlsFile }) => {
-    const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
-
+  async function processFiles(xlsFile: FileList): Promise<Data[]> {
     const processedData: Data[] = [];
 
-    const readAndProcessFile = async (file: File) => {
+    async function readAndProcessFile(file: File) {
       const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows: string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
@@ -83,11 +81,14 @@ export default function Page() {
           treatmentType,
         });
       }
-    };
+    }
 
-    const filesArray = Array.from(xlsFile);
-    await Promise.all(filesArray.map(readAndProcessFile));
+    await Promise.all(Array.from(xlsFile).map(readAndProcessFile));
 
+    return processedData;
+  }
+
+  async function sortAndSavePdf(processedData: Data[], modelPDFBytes: ArrayBuffer): Promise<Uint8Array> {
     const pdfDoc = await PDFDocument.create();
     for (const data of processedData) {
       if (!data.patientName) continue;
@@ -97,10 +98,36 @@ export default function Page() {
       copiedPages.forEach((page) => pdfDoc.addPage(page));
     }
 
-    const pdfBytes = await pdfDoc.save();
+    const sortedPdf = await PDFDocument.create();
+    const pageCount = pdfDoc.getPageCount();
+    for (let k = 0; k < 3; k++) {
+      for (let i = k; i < pageCount; i += 3) {
+        const newPdfBytes = await pdfDoc.save({
+          useObjectStreams: false,
+          updateFieldAppearances: false,
+        });
+        const newPdfDoc = await PDFDocument.load(newPdfBytes);
+        const copiedPages = await sortedPdf.copyPages(newPdfDoc, [i]);
+        copiedPages.forEach((page) => sortedPdf.addPage(page));
+      }
+    }
 
+    return sortedPdf.save();
+  }
+
+  function createPdfUrl(pdfBytes: Uint8Array): string {
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
+    return window.URL.createObjectURL(blob);
+  }
+
+  const onSubmit: SubmitHandler<Inputs> = async ({ xlsFile }) => {
+    const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
+
+    const processedData = await processFiles(xlsFile);
+
+    const sortedPdfBytes = await sortAndSavePdf(processedData, modelPDFBytes);
+
+    const url = createPdfUrl(sortedPdfBytes);
     router.push(url);
   };
 
