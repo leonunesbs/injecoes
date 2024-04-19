@@ -68,7 +68,7 @@ export default function V2() {
       pages[2].setFontSize(10);
       pages[2].setFont(timesRomanFont);
 
-      // Preencher página 1
+      // página 1
       pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
       pages[0].drawText(patientId, { x: 475, y: 633 });
       pages[0].drawText(procedureDate.split(' ')[0], { x: 53, y: 483 });
@@ -76,13 +76,13 @@ export default function V2() {
       pages[0].drawText(procedureDate.split(' ')[0], { x: 60, y: 110 });
       pages[0].drawText(treatmentType, { x: 50, y: 300 });
 
-      // Preencher página 2
+      // página 2
       pages[1].drawText(patientName.toUpperCase(), { x: 100, y: 705 });
       pages[1].drawText(patientId, { x: 440, y: 705 });
       pages[1].drawText(procedureDate.split(' ')[0], { x: 45, y: 670 });
       pages[1].drawText(staffName.toUpperCase(), { x: 75, y: 640 });
 
-      // Preencher página 3
+      // página 3
       pages[2].drawText(patientName.toUpperCase(), { x: 75, y: 330 });
       pages[2].drawText(procedureDate.split(' ')[0], { x: 345, y: 330 });
       pages[2].drawText(patientName.toUpperCase(), { x: 485, y: 330 });
