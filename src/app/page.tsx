@@ -118,10 +118,10 @@ export default function Page() {
 
   async function sortPdfPages(pdfDoc: PDFDocument): Promise<PDFDocument> {
     const sortedPdf = await PDFDocument.create();
-    const pageCount = pdfDoc.getPageCount();
-    const numColumns = 3; // Number of columns in the sorted PDF
-    for (let k = 0; k < numColumns; k++) {
-      for (let i = k; i < pageCount; i += numColumns) {
+    const totalPages = pdfDoc.getPageCount();
+    const modelPages = 3; // Number of columns in the sorted PDF
+    for (let k = 0; k < modelPages; k++) {
+      for (let i = k; i < totalPages; i += modelPages) {
         const copiedPages = await sortedPdf.copyPages(pdfDoc, [i]);
         copiedPages.forEach((page) => sortedPdf.addPage(page));
       }
