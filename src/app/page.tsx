@@ -22,7 +22,7 @@ type Inputs = {
 
 export default function Page() {
   const router = useRouter();
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit } = useForm<Inputs>({});
 
   const fillPdfTemplateWithData = async (
     { patientId, patientName, staffName, procedureDate, treatmentType }: Data,
@@ -134,7 +134,7 @@ export default function Page() {
     return sortedPdf;
   }
   async function sortAndSavePdf(processedData: Data[]): Promise<Uint8Array> {
-    const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
+    const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
     const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
     const sortedPdf = await sortPdfPages(pdfDoc);
     return sortedPdf.save();
@@ -160,7 +160,7 @@ export default function Page() {
           <h1 className="text-2xl mb-6 font-bold">HGF</h1>
           <div className="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" action={''}>
                 <div className="form-control">
                   <label htmlFor="xlsFile" className="label label-text">
                     Arquivo XLS:
@@ -168,7 +168,7 @@ export default function Page() {
                   <input
                     {...register('xlsFile')}
                     type="file"
-                    accept=".xls,.xlsx"
+                    accept=".xls,.xlsx,.csv"
                     multiple
                     className="file-input file-input-bordered"
                     required
