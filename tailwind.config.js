@@ -13,7 +13,7 @@ module.exports = {
   },
   plugins: [require('daisyui')],
   daisyui: {
-    themes: ['emerald'],
-    darkTheme: 'emerald',
+    themes: ['winter'],
+    darkTheme: 'winter',
   },
 };

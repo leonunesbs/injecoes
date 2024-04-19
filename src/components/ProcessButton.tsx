@@ -1,22 +1,22 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 interface ProcessButtonProps {
   children?: ReactNode;
+  loading: boolean;
 }
 
-export function ProcessButton({}: ProcessButtonProps) {
-  const [isLoading, setLoading] = useState(false);
+export function ProcessButton({ loading }: ProcessButtonProps) {
   return (
     <>
-      {isLoading ? (
+      {loading ? (
         <button className="btn btn-primary w-full ">
           <span className="loading loading-spinner"></span>
           Carregando...
         </button>
       ) : (
-        <button type="submit" className="btn btn-primary w-full" onClick={() => setLoading(true)}>
+        <button type="submit" className="btn btn-primary w-full">
           Processar
         </button>
       )}

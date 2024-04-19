@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { parse as parseCSV, ParseResult } from 'papaparse';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as XLSX from 'xlsx';
 
@@ -21,7 +22,6 @@ type Inputs = {
 };
 
 export default function Page() {
-  const router = useRouter();
   const { register, handleSubmit } = useForm<Inputs>({});
 
   const fillPdfTemplateWithData = async (
@@ -140,19 +140,23 @@ export default function Page() {
     return window.URL.createObjectURL(blob);
   }
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData }) => {
+    setLoading(true);
     const processedData = await processFiles(uploadedData);
     const sortedPdfBytes = await sortAndSavePdf(processedData);
 
     const url = createPdfUrl(sortedPdfBytes);
-    router.push(url);
+    window.open(url);
+    setLoading(false);
   };
 
   return (
-    <main className="py-10 px-4 space-y-10 w-full min-h-full">
+    <main>
       <section>
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-          <h1 className="text-2xl mb-6 font-bold">HGF</h1>
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen relative">
+          <h1 className="text-2xl mb-6 font-black">HGF INJEÇÕES</h1>
           <div className="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" action={''}>
@@ -168,10 +172,16 @@ export default function Page() {
                     required
                   />
                 </div>
-                <ProcessButton />
+                <ProcessButton loading={loading} />
               </form>
             </div>
           </div>
+          <span className="absolute bottom-0 bg-primary text-primary-content w-full text-center text-xs py-1">
+            Coded with ❤️ by{' '}
+            <Link href={'https://instagram.com/leonunesbs'} className="link no-underline  font-bold" target="_blank">
+              @leonunesbs
+            </Link>
+          </span>
         </div>
       </section>
     </main>
