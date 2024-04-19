@@ -164,7 +164,6 @@ export default function Page() {
                     {...register('uploadedData')}
                     type="file"
                     accept=".xls,.xlsx,.csv"
-                    multiple
                     className="file-input file-input-bordered"
                     required
                   />
