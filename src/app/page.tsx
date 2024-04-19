@@ -158,7 +158,7 @@ export default function Page() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" action={''}>
                 <div className="form-control">
                   <label htmlFor="uploadedData" className="label label-text">
-                    Arquivo XLS, XLX ou CSV:
+                    Arquivo XLS, XLXS ou CSV:
                   </label>
                   <input
                     {...register('uploadedData')}
