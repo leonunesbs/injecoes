@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { parse as parseCSV, ParseResult } from 'papaparse';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as XLSX from 'xlsx';
@@ -63,13 +64,27 @@ export default function Page() {
     return await pdfDoc.save();
   };
 
-  async function processFiles(xlsFile: FileList): Promise<Data[]> {
+  async function processFiles(file: FileList): Promise<Data[]> {
     const processedData: Data[] = [];
 
     async function readAndProcessFile(file: File) {
-      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      let rows: string[][] = [];
+
+      if (extension === 'csv') {
+        const text = await file.text();
+        const parsed = parseCSV(text, { header: true }) as ParseResult<string[]>;
+        if (parsed.errors.length > 0) {
+          throw new Error('CSV parsing error');
+        }
+        rows = parsed.data.map((row) => Object.values(row));
+      } else if (extension === 'xls' || extension === 'xlsx') {
+        const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
+      } else {
+        throw new Error('Unsupported file format');
+      }
 
       for (const row of rows.slice(4)) {
         const [patientId, , patientName, , , staffName, , procedureDate, , , treatmentType] = row;
@@ -83,7 +98,7 @@ export default function Page() {
       }
     }
 
-    await Promise.all(Array.from(xlsFile).map(readAndProcessFile));
+    await Promise.all(Array.from(file).map(readAndProcessFile));
 
     return processedData;
   }
@@ -118,7 +133,8 @@ export default function Page() {
     }
     return sortedPdf;
   }
-  async function sortAndSavePdf(processedData: Data[], modelPDFBytes: ArrayBuffer): Promise<Uint8Array> {
+  async function sortAndSavePdf(processedData: Data[]): Promise<Uint8Array> {
+    const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
     const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
     const sortedPdf = await sortPdfPages(pdfDoc);
     return sortedPdf.save();
@@ -130,11 +146,8 @@ export default function Page() {
   }
 
   const onSubmit: SubmitHandler<Inputs> = async ({ xlsFile }) => {
-    const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
-
     const processedData = await processFiles(xlsFile);
-
-    const sortedPdfBytes = await sortAndSavePdf(processedData, modelPDFBytes);
+    const sortedPdfBytes = await sortAndSavePdf(processedData);
 
     const url = createPdfUrl(sortedPdfBytes);
     router.push(url);
@@ -153,9 +166,9 @@ export default function Page() {
                     Arquivo XLS:
                   </label>
                   <input
+                    {...register('xlsFile')}
                     type="file"
                     accept=".xls,.xlsx"
-                    {...register('xlsFile')}
                     multiple
                     className="file-input file-input-bordered"
                     required
