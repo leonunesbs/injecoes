@@ -17,7 +17,7 @@ export interface Data {
 }
 
 type Inputs = {
-  xlsFile: FileList;
+  uploadedData: FileList;
 };
 
 export default function Page() {
@@ -145,8 +145,8 @@ export default function Page() {
     return window.URL.createObjectURL(blob);
   }
 
-  const onSubmit: SubmitHandler<Inputs> = async ({ xlsFile }) => {
-    const processedData = await processFiles(xlsFile);
+  const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData }) => {
+    const processedData = await processFiles(uploadedData);
     const sortedPdfBytes = await sortAndSavePdf(processedData);
 
     const url = createPdfUrl(sortedPdfBytes);
@@ -162,11 +162,11 @@ export default function Page() {
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" action={''}>
                 <div className="form-control">
-                  <label htmlFor="xlsFile" className="label label-text">
-                    Arquivo XLS:
+                  <label htmlFor="uploadedData" className="label label-text">
+                    Arquivo XLS, XLX, CSV:
                   </label>
                   <input
-                    {...register('xlsFile')}
+                    {...register('uploadedData')}
                     type="file"
                     accept=".xls,.xlsx,.csv"
                     multiple
