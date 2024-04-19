@@ -88,7 +88,7 @@ export default function Page() {
     return processedData;
   }
 
-  async function sortAndSavePdf(processedData: Data[], modelPDFBytes: ArrayBuffer): Promise<Uint8Array> {
+  async function createPdfFromData(processedData: Data[], modelPDFBytes: ArrayBuffer): Promise<PDFDocument> {
     const pdfDoc = await PDFDocument.create();
     for (const data of processedData) {
       if (!data.patientName) continue;
@@ -98,10 +98,15 @@ export default function Page() {
       copiedPages.forEach((page) => pdfDoc.addPage(page));
     }
 
+    return pdfDoc;
+  }
+
+  async function sortPdfPages(pdfDoc: PDFDocument): Promise<PDFDocument> {
     const sortedPdf = await PDFDocument.create();
     const pageCount = pdfDoc.getPageCount();
-    for (let k = 0; k < 3; k++) {
-      for (let i = k; i < pageCount; i += 3) {
+    const numColumns = 3; // Number of columns in the sorted PDF
+    for (let k = 0; k < numColumns; k++) {
+      for (let i = k; i < pageCount; i += numColumns) {
         const newPdfBytes = await pdfDoc.save({
           useObjectStreams: false,
           updateFieldAppearances: false,
@@ -111,7 +116,11 @@ export default function Page() {
         copiedPages.forEach((page) => sortedPdf.addPage(page));
       }
     }
-
+    return sortedPdf;
+  }
+  async function sortAndSavePdf(processedData: Data[], modelPDFBytes: ArrayBuffer): Promise<Uint8Array> {
+    const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
+    const sortedPdf = await sortPdfPages(pdfDoc);
     return sortedPdf.save();
   }
 
@@ -148,7 +157,7 @@ export default function Page() {
                     accept=".xls,.xlsx"
                     {...register('xlsFile')}
                     multiple
-                    className="input input-bordered"
+                    className="file-input file-input-bordered"
                     required
                   />
                 </div>
