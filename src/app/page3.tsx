@@ -3,12 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import * as XLSX from 'xlsx';
 
 import { ProcessButton } from '@/components';
 
 export interface Data {
-  patientId: string | number;
+  patientId: string;
   patientName: string;
   staffName: string;
   procedureDate: string;
@@ -16,12 +15,34 @@ export interface Data {
 }
 
 type Inputs = {
-  xlsFile: FileList;
+  csvData: string;
 };
 
-export default function Page() {
+export default function V2() {
   const router = useRouter();
   const { register, handleSubmit } = useForm<Inputs>();
+
+  function csvToArray(csvText: string): string[][] {
+    // Dividir o texto do CSV em linhas
+    const lines: string[] = csvText.split('\n');
+
+    // Determinar o separador com base na primeira linha
+    const separator: string = lines[0].includes(',') ? ',' : ';';
+
+    // Array para armazenar as colunas
+    const result: string[][] = [];
+
+    // Iterar sobre as linhas
+    lines.forEach((line) => {
+      // Dividir a linha em colunas usando o separador detectado
+      const columns: string[] = line.split(separator);
+
+      // Adicionar as colunas ao resultado
+      result.push(columns);
+    });
+
+    return result;
+  }
 
   const fillPdfTemplateWithData = async (
     { patientId, patientName, staffName, procedureDate, treatmentType }: Data,
@@ -42,7 +63,7 @@ export default function Page() {
 
     // página 1
     pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
-    pages[0].drawText(patientId.toString(), { x: 475, y: 633 });
+    pages[0].drawText(patientId, { x: 475, y: 633 });
     pages[0].drawText(procedureDate.split(' ')[0], { x: 53, y: 483 });
     pages[0].drawText(procedureDate.split(' ')[0], { x: 215, y: 483 });
     pages[0].drawText(procedureDate.split(' ')[0], { x: 60, y: 110 });
@@ -50,7 +71,7 @@ export default function Page() {
 
     // página 2
     pages[1].drawText(patientName.toUpperCase(), { x: 100, y: 705 });
-    pages[1].drawText(patientId.toString(), { x: 440, y: 705 });
+    pages[1].drawText(patientId, { x: 440, y: 705 });
     pages[1].drawText(procedureDate.split(' ')[0], { x: 45, y: 670 });
     pages[1].drawText(staffName.toUpperCase(), { x: 75, y: 640 });
 
@@ -63,33 +84,22 @@ export default function Page() {
     return await pdfDoc.save();
   };
 
-  const onSubmit: SubmitHandler<Inputs> = async ({ xlsFile }) => {
+  const onSubmit: SubmitHandler<Inputs> = async ({ csvData }) => {
     const modelPDFBytes = await fetch('https://hgf-solutions.vercel.app/modelo.pdf').then((res) => res.arrayBuffer());
 
-    const processedData: Data[] = [];
-
-    const readAndProcessFile = async (file: File) => {
-      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
-
-      for (const row of rows.slice(4)) {
-        const [patientId, , patientName, , , staffName, , procedureDate, , , treatmentType] = row;
-        processedData.push({
-          patientId: typeof patientId === 'number' ? String(patientId) : patientId,
-          patientName,
-          staffName,
-          procedureDate,
-          treatmentType,
-        });
-      }
-    };
-
-    const filesArray = Array.from(xlsFile);
-    await Promise.all(filesArray.map(readAndProcessFile));
+    const processedData = csvToArray(csvData)
+      .slice(4)
+      .map((row: any) => ({
+        patientId: row[0],
+        patientName: row[2],
+        staffName: row[5],
+        procedureDate: row[7],
+        treatmentType: row[10],
+      }));
 
     const pdfDoc = await PDFDocument.create();
-    for (const data of processedData) {
+    for (let i = 0; i < processedData.length; i++) {
+      const data = processedData[i];
       if (!data.patientName) continue;
       const newPdfBytes = await fillPdfTemplateWithData(data, modelPDFBytes);
       const newPdfDoc = await PDFDocument.load(newPdfBytes);
@@ -113,17 +123,10 @@ export default function Page() {
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="form-control">
-                  <label htmlFor="xlsFile" className="label label-text">
-                    Arquivo XLS:
+                  <label htmlFor="csvData" className="label label-text">
+                    Dados CSV:
                   </label>
-                  <input
-                    type="file"
-                    accept=".xls,.xlsx"
-                    {...register('xlsFile')}
-                    multiple
-                    className="input input-bordered"
-                    required
-                  />
+                  <textarea {...register('csvData')} className="textarea textarea-bordered w-full" required />
                 </div>
                 <ProcessButton />
               </form>

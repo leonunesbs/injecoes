@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import CSVReader from 'react-csv-reader';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { Data } from '@/app/page';
+import { Data } from '@/app/page3';
 import { AdvancedConfig } from './AdvancedConfig';
 import { FillPdf } from './FillPdf';
 

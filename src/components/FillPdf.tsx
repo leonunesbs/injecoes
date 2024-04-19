@@ -1,7 +1,7 @@
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { ReactNode } from 'react';
 
-import { Data } from '@/app/page';
+import { Data } from '@/app/page3';
 
 interface FillPdfProps {
   children?: ReactNode;

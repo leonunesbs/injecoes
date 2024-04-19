@@ -1,4 +1,4 @@
-import { Data } from '@/app/page';
+import { Data } from '@/app/page3';
 
 interface QueueTableProps {
   queuedData: Data[];

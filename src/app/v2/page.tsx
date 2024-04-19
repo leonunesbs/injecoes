@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { Resend } from 'resend';
 
-import { Data } from '../page';
+import { Data } from '../page3';
 
 export default function V2() {
   async function action(data: FormData) {

@@ -35,7 +35,8 @@
     "react-csv-reader": "4.0.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.51.2",
-    "resend": "3.2.0"
+    "resend": "3.2.0",
+    "xlsx": "0.18.5"
   },
   "devDependencies": {
     "@commitlint/cli": "18.6.1",
