@@ -122,12 +122,7 @@ export default function Page() {
     const numColumns = 3; // Number of columns in the sorted PDF
     for (let k = 0; k < numColumns; k++) {
       for (let i = k; i < pageCount; i += numColumns) {
-        const newPdfBytes = await pdfDoc.save({
-          useObjectStreams: false,
-          updateFieldAppearances: false,
-        });
-        const newPdfDoc = await PDFDocument.load(newPdfBytes);
-        const copiedPages = await sortedPdf.copyPages(newPdfDoc, [i]);
+        const copiedPages = await sortedPdf.copyPages(pdfDoc, [i]);
         copiedPages.forEach((page) => sortedPdf.addPage(page));
       }
     }
