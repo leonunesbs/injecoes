@@ -1,90 +1,63 @@
-# Manual de Uso
+# Manual de Uso da Aplicação HGF Injeções
+
+Este manual serve como um guia para utilizar a aplicação web HGF Injeções, uma ferramenta desenvolvida para facilitar o preenchimento automático e a geração de documentos PDF baseados em dados de pacientes e procedimentos médicos extraídos de arquivos XLS, XLSX, ou CSV.
 
 ## Índice
 
-1. [Visão Geral](#visão-geral)
-2. [Funcionalidades Principais](#funcionalidades-principais)
-3. [Instruções de Uso](#instruções-de-uso)
-4. [Tutorial: Emissão de Relatório no Integra](#tutorial-emissão-de-relatório-no-integra)
-5. [Autoria e Créditos](#autoria-e-créditos)
+- [Visão Geral](#visão-geral)
+- [Funcionalidades Principais](#funcionalidades-principais)
+- [Instruções de Uso](#instruções-de-uso)
+  - [Carregar Arquivo](#carregar-arquivo)
+  - [Processar Arquivo](#processar-arquivo)
+  - [Visualizar PDF](#visualizar-pdf)
+- [Tutorial: Emissão de Relatório no Integra](#tutorial-emissão-de-relatório-no-integra)
+- [Autoria e Créditos](#autoria-e-créditos)
 
-## Visão Geral:
+## Visão Geral
 
-Este código é uma aplicação web que permite carregar arquivos no formato XLS, XLSX ou CSV gerados no INTEGRA, processá-los e gerar um PDF preenchido com os dados desses arquivos. O PDF gerado é uma versão personalizada de um modelo padrão, onde os dados carregados são inseridos em campos específicos.
+A aplicação HGF Injeções foi criada com o objetivo de otimizar o processo de documentação de procedimentos médicos, transformando arquivos de dados em documentos PDF estruturados e facilmente acessíveis. Através de uma interface amigável, os usuários podem carregar seus arquivos de dados, que são então processados e convertidos em PDFs seguindo um modelo padrão.
 
-## Funcionalidades Principais:
+## Funcionalidades Principais
 
-1. **Carregamento de Arquivo:**
-   - Os usuários podem carregar arquivos nos formatos XLS, XLSX ou CSV gerados no INTEGRA.
-   - Os arquivos carregados devem seguir as seguintes regras:
-     - A primeira linha de dados deve iniciar na quinta linha do arquivo.
-     - O número do prontuário do paciente deve estar na primeira coluna.
-     - O nome do paciente deve estar na terceira coluna.
-     - O nome do profissional deve estar na sexta coluna.
-     - O tratamento deve estar na décima primeira coluna.
-   - Essas regras devem ser seguidas para garantir o processamento correto dos dados e o preenchimento adequado do PDF.
+- **Carregamento de Arquivo:** Aceita arquivos nos formatos XLS, XLSX ou CSV contendo dados de pacientes e procedimentos médicos.
+  
+- **Processamento de Arquivo:** Extrai e valida as informações dos arquivos carregados, preparando-os para a geração do PDF.
+  
+- **Preenchimento do PDF:** Insere os dados processados em um modelo de PDF pré-definido, gerando um documento finalizado e pronto para uso.
+  
+- **Ordenação das Páginas do PDF:** Organiza as páginas do documento gerado em uma sequência lógica e prática para consulta.
+  
+- **Visualização do PDF:** Permite aos usuários visualizar, baixar ou imprimir o PDF gerado diretamente da aplicação.
 
-2. **Processamento de Arquivo:**
-   - Os arquivos carregados são processados para extrair os dados relevantes, conforme as regras especificadas.
-   - Dependendo do formato do arquivo (CSV, XLS ou XLSX), os dados são extraídos de maneira apropriada.
+## Instruções de Uso
 
-3. **Preenchimento do PDF:**
-   - Os dados extraídos dos arquivos são inseridos em campos específicos de um modelo PDF padrão.
-   - O preenchimento é realizado em várias páginas do PDF, seguindo um layout predefinido.
+### Carregar Arquivo
 
-4. **Ordenação das Páginas do PDF:**
-   - As páginas preenchidas do PDF são ordenadas de acordo com um layout específico.
+1. Acesse a aplicação e localize o campo de carregamento de arquivo.
+2. Selecione o arquivo desejado, respeitando os formatos aceitos (XLS, XLSX, CSV).
+3. Confirme o carregamento e prossiga para o processamento do arquivo.
 
-5. **Visualização do PDF:**
-   - Após o processamento e a geração do PDF, os usuários podem visualizar o PDF resultante.
-   - O PDF gerado será aberto automaticamente em uma nova guia do navegador.
+### Processar Arquivo
 
-## Instruções de Uso:
+1. Após carregar o(s) arquivo(s), clique no botão "Processar".
+2. Aguarde a conclusão do processamento. Uma barra de progresso pode indicar o status do processamento.
 
-1. **Carregar Arquivo:**
-   - Clique no botão "Escolher arquivo" e selecione um arquivo nos formatos XLS, XLSX ou CSV [gerados no INTEGRA](#tutorial-emissão-de-relatório-no-integra).
-   - Certifique-se de que o arquivo selecionado segue as regras especificadas para garantir o processamento correto.
-   - Caso o arquivo não esteja no formato correto ou não siga as regras especificadas, o processo de processamento e geração do PDF pode falhar.
+### Visualizar PDF
 
-2. **Processar Arquivo:**
-   - Após selecionar o arquivo, clique no botão "Processar".
-   - Aguarde até que o processo de carregamento e processamento do arquivo seja concluído.
-   - Durante o processamento, uma barra de progresso pode ser exibida para indicar o progresso do processo.
-
-3. **Visualizar PDF:**
-   - Após o processamento bem-sucedido, o PDF preenchido será gerado.
-   - O PDF gerado será aberto automaticamente em uma nova guia do navegador.
-   - Você pode visualizar e baixar o PDF conforme necessário.
-
-4. **Considerações Adicionais:**
-   - Certifique-se de que os arquivos carregados estejam no formato correto (XLS, XLSX ou CSV gerados no INTEGRA).
-   - Verifique se os dados nos arquivos seguem as regras especificadas para garantir o preenchimento correto do PDF.
+1. Com o processamento concluído, o PDF gerado será disponibilizado para visualização.
+2. Utilize as opções fornecidas pela aplicação para baixar ou imprimir o documento conforme necessário.
 
 ## Tutorial: Emissão de Relatório no Integra
 
-Para utilizar o aplicativo e gerar o PDF preenchido, primeiro você precisará obter um arquivo nos formatos XLS, XLSX ou CSV gerado no Integra. Siga os passos abaixo para emitir o relatório no Integra:
+Para gerar um relatório no Integra adequado para uso com esta aplicação, siga os passos abaixo:
 
-1. **Acesso ao Integra:**
-   - Acesse o Integra utilizando suas credenciais de usuário.
+1. **Acesso ao Integra:** Entre no sistema Integra com suas credenciais.
+2. **Navegação até Relatórios:** Selecione a opção de relatórios no menu principal.
+3. **Emissão do Relatório:** Escolha o tipo de relatório desejado, defina os filtros necessários e proceda com a emissão do relatório.
+4. **Download do Arquivo:** Faça o download do relatório gerado em um dos formatos aceitos pela aplicação (XLS, XLSX, CSV).
 
-2. **Navegação para Relatórios:**
-   - Após o login, navegue até a aba de "Relatórios" no menu superior.
+## Autoria e Créditos
 
-3. **Seleção de Relatórios por Ambulatório e Especialidades:**
-   - Dentro da seção de relatórios, localize e selecione a opção "Relatórios por Ambulatório e Especialidades".
+Esta aplicação foi desenvolvida por @leonunesbs. Para mais informações, contribuições ou suporte, por favor, acesse o [repositório do projeto no GitHub](https://github.com/leonunesbs).
 
-4. **Definição do Intervalo de Datas:**
-   - Digite o intervalo de datas desejado para o relatório.
-
-5. **Seleção do Tipo de Tratamento:**
-   - Selecione o tipo de tratamento desejado, como "EYLIA - Injeção Intravítria" ou "Avastin - Injeção Intravítria".
-
-6. **Busca e Download da Planilha:**
-   - Após configurar os filtros necessários, clique em "Buscar" para gerar o relatório correspondente.
-   - Localize a opção para fazer o download da planilha gerada e clique para baixá-la em um formato compatível (XLS, XLSX ou CSV).
-
-Após seguir esses passos e obter o arquivo do relatório no Integra, você estará pronto para carregar e processar o arquivo no aplicativo, conforme descrito nas instruções de uso.
-
-## Autoria e Créditos:
-
-Este código foi desenvolvido por @leonunesbs. Para mais informações, sugestões ou suporte, entre em contato com o autor.
+Caso tenha dúvidas ou sugestões, não hesite em entrar em contato com o desenvolvedor através do GitHub.
