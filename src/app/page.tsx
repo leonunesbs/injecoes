@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { parse as parseCSV, ParseResult } from 'papaparse';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as XLSX from 'xlsx';
 
@@ -143,6 +143,9 @@ export default function Page() {
   }
 
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const [url, setUrl] = useState('');
 
   const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData }) => {
     setLoading(true);
@@ -150,9 +153,37 @@ export default function Page() {
     const sortedPdfBytes = await sortAndSavePdf(processedData);
 
     const url = createPdfUrl(sortedPdfBytes);
-    window.open(url);
-    setLoading(false);
+    setUrl(url);
   };
+
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setProgress((oldProgress) => {
+          if (oldProgress === 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          // Calcula o incremento para completar em 2 segundos considerando um intervalo de 30ms
+          const increment = 100 / (2000 / 20);
+          return Math.min(oldProgress + increment, 100);
+        });
+      }, 20);
+
+      return () => {
+        setLoading(false);
+        clearInterval(interval);
+      };
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (url && progress == 100) {
+      window.open(url, '_blank');
+      setLoading(false);
+      setProgress(0);
+    }
+  }, [progress, url]);
 
   return (
     <main>
@@ -173,6 +204,11 @@ export default function Page() {
                     className="file-input file-input-bordered"
                     required
                   />
+                </div>
+                <div className="flex">
+                  {loading && (
+                    <progress className="progress w-56 mx-auto progress-primary" value={progress} max="100"></progress>
+                  )}
                 </div>
                 <ProcessButton loading={loading} />
               </form>
