@@ -159,9 +159,9 @@ export default function Page() {
       <section>
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen relative">
           <h1 className="text-2xl mb-6 font-black">HGF INJEÇÕES</h1>
-          <div className="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
-            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" action={''}>
+          <div className="card bg-base-200">
+            <div className="card-body">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="form-control">
                   <label htmlFor="uploadedData" className="label label-text">
                     Arquivo XLS, XLXS ou CSV:

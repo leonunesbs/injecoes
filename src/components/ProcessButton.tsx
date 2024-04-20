@@ -12,12 +12,12 @@ export function ProcessButton({ loading }: ProcessButtonProps) {
   return (
     <div className="join join-vertical w-full">
       {loading ? (
-        <button className="btn  btn-primary w-full join-item">
+        <button className="btn  btn-outline btn-primary w-full join-item">
           <span className="loading loading-spinner"></span>
           Carregando...
         </button>
       ) : (
-        <button type="submit" className="btn  btn-primary w-full join-item">
+        <button type="submit" className="btn  btn-outline btn-primary w-full join-item">
           Processar
         </button>
       )}
