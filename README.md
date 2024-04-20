@@ -68,16 +68,16 @@ Para utilizar o aplicativo e gerar o PDF preenchido, primeiro você precisará o
    - Acesse o Integra utilizando suas credenciais de usuário.
 
 2. **Navegação para Relatórios:**
-   - Após o login, navegue até a aba de "Relatórios" no menu principal.
+   - Após o login, navegue até a aba de "Relatórios" no menu superior.
 
 3. **Seleção de Relatórios por Ambulatório e Especialidades:**
    - Dentro da seção de relatórios, localize e selecione a opção "Relatórios por Ambulatório e Especialidades".
 
 4. **Definição do Intervalo de Datas:**
-   - Digite o intervalo de datas desejado para o relatório. Isso ajudará a filtrar os dados conforme necessário.
+   - Digite o intervalo de datas desejado para o relatório.
 
 5. **Seleção do Tipo de Tratamento:**
-   - Selecione o tipo de tratamento desejado, como "Aelia Injeção Intravítria" ou "Avastin Injeção Intravítria".
+   - Selecione o tipo de tratamento desejado, como "EYLIA - Injeção Intravítria" ou "Avastin - Injeção Intravítria".
 
 6. **Busca e Download da Planilha:**
    - Após configurar os filtros necessários, clique em "Buscar" para gerar o relatório correspondente.
