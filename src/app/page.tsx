@@ -75,7 +75,8 @@ export default function Page() {
         const text = await file.text();
         const parsed = parseCSV(text, { header: true }) as ParseResult<string[]>;
         if (parsed.errors.length > 0) {
-          throw new Error('CSV parsing error');
+          alert('CSV parsing error');
+          return false;
         }
         rows = parsed.data.map((row) => Object.values(row));
       } else if (extension === 'xls' || extension === 'xlsx') {
@@ -83,7 +84,8 @@ export default function Page() {
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
       } else {
-        throw new Error('Unsupported file format');
+        alert('Unsupported file format');
+        return false;
       }
 
       for (const row of rows.slice(4)) {
