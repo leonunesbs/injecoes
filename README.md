@@ -74,8 +74,8 @@ Para gerar um relatório no Integra adequado para uso com esta aplicação, siga
 
 ## Autoria e Créditos
 
-Desenvolvida por @leonunesbs. Para suporte ou mais informações, visite o [repositório no GitHub](https://github.com/leonunesbs).
+Desenvolvid por @leonunesbs. Para suporte ou mais informações, visite o [repositório no GitHub](https://github.com/leonunesbs).
 
 Este manual combinado oferece uma visão abrangente e detalhada tanto da utilização da aplicação HGF Injeções quanto do
 
-procedimento para a checagem de prontuários, assegurando um processo mais eficiente e organizado para os profissionais envolvidos.
+procedimento para a checagem de prontuários, assegurando um processo mais eficiente e organizado para os residentes.
