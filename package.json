@@ -41,8 +41,8 @@
     "xlsx": "0.18.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "18.6.1",
-    "@commitlint/config-conventional": "18.6.3",
+    "@commitlint/cli": "19.2.2",
+    "@commitlint/config-conventional": "19.2.2",
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@types/file-saver": "2.0.7",
     "@types/node": "20.12.7",
