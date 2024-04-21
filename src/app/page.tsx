@@ -21,7 +21,7 @@ export default function Page() {
             <div className="card-body">
               <div className="flex text-center w-full justify-center">
                 <Link
-                  href={'https://github.com'}
+                  href={'https://google.com'}
                   className="link link-primary flex items-center no-underline"
                   target="_blank"
                 >
