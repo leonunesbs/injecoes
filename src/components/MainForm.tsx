@@ -21,7 +21,7 @@ type Inputs = {
 
 export function MainForm({}: MainFormProps) {
   const { register, handleSubmit } = useForm<Inputs>({});
-
+  const [url, setUrl] = useState('');
   async function sortAndSavePdf(processedData: Data[]): Promise<Uint8Array> {
     const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
     const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
@@ -38,7 +38,7 @@ export function MainForm({}: MainFormProps) {
     const url = createPdfUrl(sortedPdfBytes);
     setTimeout(() => {
       setLoading(false);
-      window.open(url, '_blank');
+      setUrl(url);
     }, 2000);
   };
   return (
@@ -52,7 +52,12 @@ export function MainForm({}: MainFormProps) {
           </div>
         </label>
         <input
-          {...register('uploadedData')}
+          {...register('uploadedData', {
+            onChange: () => {
+              setLoading(false);
+              setUrl('');
+            },
+          })}
           type="file"
           accept=".xls,.xlsx,.csv"
           className="file-input file-input-bordered"
@@ -60,7 +65,7 @@ export function MainForm({}: MainFormProps) {
         />
       </div>
       <ProgressBar loading={loading} />
-      <ProcessButton loading={loading} />
+      <ProcessButton loading={loading} url={url} />
     </form>
   );
 }
