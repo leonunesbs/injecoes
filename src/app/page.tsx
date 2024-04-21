@@ -23,8 +23,8 @@ export default function Page() {
                 <Image
                   alt="Vítreo Logo"
                   src={'/logo.jpg'}
-                  width={150}
-                  height={150}
+                  width={100}
+                  height={100}
                   priority
                   blurDataURL="/logo.jpg"
                   placeholder="blur"
