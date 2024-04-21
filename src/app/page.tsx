@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { RxExternalLink } from 'react-icons/rx';
 
@@ -16,7 +17,11 @@ export default function Page() {
     <main>
       <section>
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen relative">
-          <h1 className="text-4xl text-center mb-14 font-black">INJEÇÕES</h1>
+          <div className="avatar mb-10">
+            <div className="mask mask-squircle">
+              <Image alt="Vítreo Logo" src={'/logo.jpg'} width={150} height={150} />
+            </div>
+          </div>
           <div className="card dark:bg-base-200 w-full max-w-md shadow">
             <div className="card-body">
               <div className="flex text-center w-full justify-center">
