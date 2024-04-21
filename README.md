@@ -33,7 +33,7 @@ A aplicação HGF Injeções foi desenvolvida para otimizar o processo de docume
 ### Carregar Arquivo
 
 1. Acesse a aplicação e localize o campo de carregamento de arquivo.
-2. Selecione o arquivo nos formatos aceitos e confirme o carregamento.
+2. Selecione o arquivo nos [formatos aceitos](#tutorial-emissão-de-relatório-no-integra) e confirme o carregamento.
 
 ### Processar Arquivo
 
