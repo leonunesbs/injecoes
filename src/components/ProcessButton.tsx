@@ -9,9 +9,9 @@ interface ProcessButtonProps {
 
 export function ProcessButton({ loading }: ProcessButtonProps) {
   return (
-    <div className="space-y-2">
+    <div className="join join-vertical w-full">
       {loading ? (
-        <button className="btn  btn-primary w-full">
+        <button className="btn  btn-primary w-full join-item">
           <span className="loading loading-ring"></span>
           Aguarde...
         </button>
@@ -21,7 +21,7 @@ export function ProcessButton({ loading }: ProcessButtonProps) {
           Processar
         </button>
       )}
-      <Link href={'https://bit.ly/4d3XjY3'} className="btn btn-ghost w-full" target="_blank">
+      <Link href={'https://bit.ly/4d3XjY3'} className="btn btn-ghost w-full join-item" target="_blank">
         <FaCircleInfo className="h-4 w-4" />
         Ajuda
       </Link>
