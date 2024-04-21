@@ -13,7 +13,7 @@ export function ProcessButton({ loading }: ProcessButtonProps) {
       {loading ? (
         <button className="btn  btn-primary w-full">
           <span className="loading loading-spinner"></span>
-          Carregando...
+          Aguarde...
         </button>
       ) : (
         <button type="submit" className="btn  btn-primary w-full join-item">
