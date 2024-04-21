@@ -20,7 +20,7 @@ export default function Page() {
           <div className="mb-4 items-center flex flex-col space-y-4 text-center">
             <div className="avatar ">
               <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow">
-                <Image alt="Vítreo Logo" src={'/logo.jpg'} width={150} height={150} />
+                <Image alt="Vítreo Logo" src={'/logo.jpg'} width={150} height={150} priority />
               </div>
             </div>
             <h1 className="font-black font-mono text-2xl">Relatório de Injeções</h1>
