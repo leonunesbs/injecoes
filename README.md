@@ -74,8 +74,6 @@ Para gerar um relatório no Integra adequado para uso com esta aplicação, siga
 
 ## Autoria e Créditos
 
-Desenvolvido por @leonunesbs. Para suporte ou mais informações, visite o [repositório no GitHub](https://github.com/leonunesbs).
+Desenvolvido por Leonardo Nunes (@leonunesbs), residente de oftalmologia no Hospital Geral de Fortaleza (HGF), com o objetivo de otimizar processos de documentação médica e promover a segurança do paciente em procedimentos oftalmológicos. Para suporte ou mais informações, visite o [repositório no GitHub](https://github.com/leonunesbs).
 
-Este manual combinado oferece uma visão abrangente e detalhada tanto da utilização da aplicação HGF Injeções quanto do
-
-procedimento para a checagem de prontuários, assegurando um processo mais eficiente e organizado para os residentes.
+Este manual combinado oferece uma visão abrangente e detalhada tanto da utilização da aplicação HGF Injeções quanto do procedimento para a checagem de prontuários, assegurando um processo mais eficiente e organizado para os residentes e profissionais de saúde envolvidos em tratamentos oftalmológicos.
