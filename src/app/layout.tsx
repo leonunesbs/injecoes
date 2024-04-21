@@ -3,7 +3,7 @@ import '@/styles/globals.css';
 import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-  title: `Vítreo`,
+  title: `Vítreo - Relatório de Injeções`,
   description: `Processa planilhas e gera relatórios.`,
   robots: {
     index: false,
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     nocache: true,
   },
   generator: 'Next.js',
-  applicationName: 'Vítreo',
+  applicationName: `Vítreo - Relatório de Injeções`,
   referrer: 'origin-when-cross-origin',
   keywords: ['Next.js', 'React', 'JavaScript', 'HGF', 'njeções intravítreas'],
   authors: [{ name: 'Leonardo Nunes', url: 'https://github.com/leonunesbs' }],
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: 'Vítreo Injeções',
     description: 'The React Framework for the Web',
     url: 'https://vitreo.in',
-    siteName: 'Vítreo',
+    siteName: `Vítreo - Relatório de Injeções`,
     images: [
       {
         url: 'https://vitreo.in/next.svg',
