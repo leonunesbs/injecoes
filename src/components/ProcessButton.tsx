@@ -21,11 +21,7 @@ export function ProcessButton({ loading }: ProcessButtonProps) {
           Processar
         </button>
       )}
-      <Link
-        href={'https://github.com/leonunesbs/injecoes?tab=readme-ov-file#manual-de-uso'}
-        className="btn btn-ghost w-full"
-        target="_blank"
-      >
+      <Link href={'https://bit.ly/4d3XjY3'} className="btn btn-ghost w-full" target="_blank">
         <FaCircleInfo className="h-4 w-4" />
         Ajuda
       </Link>
