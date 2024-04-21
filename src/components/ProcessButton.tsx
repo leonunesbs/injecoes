@@ -12,7 +12,7 @@ export function ProcessButton({ loading }: ProcessButtonProps) {
     <div className="space-y-2">
       {loading ? (
         <button className="btn  btn-primary w-full">
-          <span className="loading loading-spinner"></span>
+          <span className="loading loading-ring"></span>
           Aguarde...
         </button>
       ) : (
