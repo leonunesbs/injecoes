@@ -17,10 +17,13 @@ export default function Page() {
     <main>
       <section>
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen relative">
-          <div className="avatar mb-10">
-            <div className="mask mask-squircle">
-              <Image alt="Vítreo Logo" src={'/logo.jpg'} width={150} height={150} />
+          <div className="mb-4 items-center flex flex-col space-y-4 text-center">
+            <div className="avatar ">
+              <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow">
+                <Image alt="Vítreo Logo" src={'/logo.jpg'} width={150} height={150} />
+              </div>
             </div>
+            <h1 className="font-black font-mono text-2xl">Relatório de Injeções</h1>
           </div>
           <div className="card dark:bg-base-200 w-full max-w-md shadow">
             <div className="card-body">
