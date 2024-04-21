@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { FaBolt, FaCircleInfo } from 'react-icons/fa6';
 
 interface ProcessButtonProps {
   loading: boolean;
@@ -8,26 +9,26 @@ interface ProcessButtonProps {
 
 export function ProcessButton({ loading }: ProcessButtonProps) {
   return (
-    <>
-      <div className="join join-vertical w-full">
-        {loading ? (
-          <button className="btn  btn-outline btn-primary w-full join-item">
-            <span className="loading loading-spinner"></span>
-            Carregando...
-          </button>
-        ) : (
-          <button type="submit" className="btn  btn-outline btn-primary w-full join-item">
-            Processar
-          </button>
-        )}
-        <Link
-          href={'https://github.com/leonunesbs/injecoes?tab=readme-ov-file#manual-de-uso'}
-          className="btn  btn-outline btn-neutral w-full join-item"
-          target="_blank"
-        >
-          Ajuda
-        </Link>
-      </div>
-    </>
+    <div className="space-y-2">
+      {loading ? (
+        <button className="btn  btn-primary w-full">
+          <span className="loading loading-spinner"></span>
+          Carregando...
+        </button>
+      ) : (
+        <button type="submit" className="btn  btn-primary w-full join-item">
+          <FaBolt className="h-4 w-4" />
+          Processar
+        </button>
+      )}
+      <Link
+        href={'https://github.com/leonunesbs/injecoes?tab=readme-ov-file#manual-de-uso'}
+        className="btn btn-ghost w-full"
+        target="_blank"
+      >
+        <FaCircleInfo className="h-4 w-4" />
+        Ajuda
+      </Link>
+    </div>
   );
 }

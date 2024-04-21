@@ -5,6 +5,7 @@ import { parse as parseCSV, ParseResult } from 'papaparse';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { TbFileTypeCsv, TbFileTypeXls } from 'react-icons/tb';
 import * as XLSX from 'xlsx';
 
 import { ProcessButton } from '@/components';
@@ -190,12 +191,16 @@ export default function Page() {
       <section>
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen relative">
           <h1 className="text-2xl mb-6 font-black">HGF INJEÇÕES</h1>
-          <div className="card bg-base-200">
+          <div className="card dark:bg-base-200 w-full max-w-md shadow">
             <div className="card-body">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="form-control">
                   <label htmlFor="uploadedData" className="label label-text">
                     Arquivo XLS, XLXS ou CSV:
+                    <div className="join join-horizontal">
+                      <TbFileTypeXls className="h-5 w-5 join-item" />
+                      <TbFileTypeCsv className="h-5 w-5 join-item" />
+                    </div>
                   </label>
                   <input
                     {...register('uploadedData')}
