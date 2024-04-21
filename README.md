@@ -1,6 +1,6 @@
 # Guia Prático para Injeções Intravítreas: Uso da Aplicação Injeções e Protocolos de Checagem de Prontuário
 
-Este manual combinado fornece um guia completo sobre como utilizar a aplicação web HGF Injeções para facilitar o preenchimento automático e a geração de documentos PDF a partir de dados médicos, bem como instruções detalhadas para a checagem de prontuários no contexto de tratamentos com injeções.
+Este manual combinado fornece um guia completo sobre como utilizar a aplicação web HGF Injeções para facilitar o preenchimento automático e a geração de documentos PDF a partir de dados do mapa de procedimentos, bem como instruções detalhadas para a checagem de prontuários no contexto da segurança do paciente quanto à lateralidade.
 
 ## Índice
 
