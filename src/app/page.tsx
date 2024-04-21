@@ -26,7 +26,7 @@ export default function Page() {
                   width={100}
                   height={100}
                   priority
-                  blurDataURL="/logo.jpg"
+                  blurDataURL="https://vitreo.in/logo.jpg"
                   placeholder="blur"
                   quality={80}
                 />
