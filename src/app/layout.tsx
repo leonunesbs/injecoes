@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 
 import { Metadata, Viewport } from 'next';
+import Head from 'next/head';
 
 export const metadata: Metadata = {
   title: `Vítreo - Relatório de Injeções`,
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
     other: {
       rel: 'mask-icon',
       url: '/safari-pinned-tab.svg',
-      color: '#5773ff',
+      color: '#2570b5',
     },
   },
   manifest: '/site.webmanifest',
@@ -70,6 +71,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-br">
+      <Head>
+        <meta name="apple-mobile-web-app-title" content="V&iacute;treo" />
+        <meta name="application-name" content="V&iacute;treo" />
+        <meta name="msapplication-TileColor" content="#2b5797" />
+      </Head>
       <body>{children}</body>
     </html>
   );

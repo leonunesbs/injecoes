@@ -1,6 +1,6 @@
 {
-    "name": "Vitreo",
-    "short_name": "Vitreo",
+    "name": "V\u00edtreo",
+    "short_name": "V\u00edtreo",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -11,6 +11,11 @@
             "src": "/android-chrome-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
+        },
+        {
+            "src": "/safari-pinned-tab.svg",
+            "sizes": "192x192",
+            "purpose": "any maskable"
         }
     ],
     "theme_color": "#ffffff",
