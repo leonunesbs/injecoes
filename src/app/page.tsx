@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { RxExternalLink } from 'react-icons/rx';
 
 import { MainForm } from '@/components';
 
@@ -18,6 +19,15 @@ export default function Page() {
           <h1 className="text-4xl text-center mb-14 font-black">HGF INJEÇÕES</h1>
           <div className="card dark:bg-base-200 w-full max-w-md shadow">
             <div className="card-body">
+              <div className="flex text-center w-full justify-center">
+                <Link
+                  href={'https://github.com'}
+                  className="link link-primary flex items-center no-underline"
+                  target="_blank"
+                >
+                  Acessar Integra <RxExternalLink className="ml-1 w-4 h-4" />
+                </Link>
+              </div>
               <MainForm />
             </div>
           </div>
