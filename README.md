@@ -1,6 +1,6 @@
-# Manual de Uso da Aplicação HGF Injeções
+# Guia Prático para Injeções Intravítreas: Uso da Aplicação HGF e Protocolos de Checagem de Prontuário
 
-Este manual serve como um guia para utilizar a aplicação web HGF Injeções, uma ferramenta desenvolvida para facilitar o preenchimento automático e a geração de documentos PDF baseados em dados de pacientes e procedimentos médicos extraídos de arquivos XLS, XLSX, ou CSV.
+Este manual combinado fornece um guia completo sobre como utilizar a aplicação web HGF Injeções para facilitar o preenchimento automático e a geração de documentos PDF a partir de dados médicos, bem como instruções detalhadas para a checagem de prontuários no contexto de tratamentos com injeções.
 
 ## Índice
 
@@ -10,42 +10,58 @@ Este manual serve como um guia para utilizar a aplicação web HGF Injeções, u
   - [Carregar Arquivo](#carregar-arquivo)
   - [Processar Arquivo](#processar-arquivo)
   - [Visualizar PDF](#visualizar-pdf)
+- [Tutorial: Checagem de Prontuário](#tutorial-checagem-de-prontuário)
+  - [Primeira Injeção](#primeira-injeção)
+  - [Injeções Subsequentes](#injeções-subsequentes)
+  - [Última Injeção e Conclusão de Tratamento](#última-injeção-e-conclusão-de-tratamento)
 - [Tutorial: Emissão de Relatório no Integra](#tutorial-emissão-de-relatório-no-integra)
 - [Autoria e Créditos](#autoria-e-créditos)
 
 ## Visão Geral
 
-A aplicação HGF Injeções foi criada com o objetivo de otimizar o processo de documentação de procedimentos médicos, transformando arquivos de dados em documentos PDF estruturados e facilmente acessíveis. Através de uma interface amigável, os usuários podem carregar seus arquivos de dados, que são então processados e convertidos em PDFs seguindo um modelo padrão.
+A aplicação HGF Injeções foi desenvolvida para otimizar o processo de documentação de procedimentos médicos, transformando arquivos de dados em documentos PDF estruturados. Complementarmente, o tutorial de checagem de prontuário orienta sobre como verificar a adequação e a sequência de tratamentos com injeções.
 
 ## Funcionalidades Principais
 
-- **Carregamento de Arquivo:** Aceita arquivos nos formatos XLS, XLSX ou CSV contendo dados de pacientes e procedimentos médicos.
-  
-- **Processamento de Arquivo:** Extrai e valida as informações dos arquivos carregados, preparando-os para a geração do PDF.
-  
-- **Preenchimento do PDF:** Insere os dados processados em um modelo de PDF pré-definido, gerando um documento finalizado e pronto para uso.
-  
-- **Ordenação das Páginas do PDF:** Organiza as páginas do documento gerado em uma sequência lógica e prática para consulta.
-  
-- **Visualização do PDF:** Permite aos usuários visualizar, baixar ou imprimir o PDF gerado diretamente da aplicação.
+- **Carregamento de Arquivo:** Suporte a XLS, XLSX ou CSV com dados de pacientes e procedimentos médicos.
+- **Processamento de Arquivo:** Extração e validação das informações dos arquivos, preparando para geração do PDF.
+- **Preenchimento do PDF:** Geração de documentos PDF a partir de um modelo pré-definido com os dados processados.
+- **Ordenação e Visualização do PDF:** Organização lógica das páginas do PDF e opções para visualização, download ou impressão.
 
 ## Instruções de Uso
 
 ### Carregar Arquivo
 
 1. Acesse a aplicação e localize o campo de carregamento de arquivo.
-2. Selecione o arquivo desejado, respeitando os formatos aceitos (XLS, XLSX, CSV).
-3. Confirme o carregamento e prossiga para o processamento do arquivo.
+2. Selecione o arquivo nos formatos aceitos e confirme o carregamento.
 
 ### Processar Arquivo
 
-1. Após carregar o(s) arquivo(s), clique no botão "Processar".
-2. Aguarde a conclusão do processamento. Uma barra de progresso pode indicar o status do processamento.
+1. Clique em "Processar" após o carregamento do arquivo.
+2. Acompanhe o processamento até a conclusão.
 
 ### Visualizar PDF
 
-1. Com o processamento concluído, o PDF gerado será disponibilizado para visualização.
-2. Utilize as opções fornecidas pela aplicação para baixar ou imprimir o documento conforme necessário.
+1. Após o processamento, o PDF estará disponível para visualização.
+2. Baixe ou imprima o documento conforme necessário.
+
+## Tutorial: Checagem de Prontuário
+
+### Primeira Injeção
+
+- Para a primeira injeção indicada, localize a última página de indicação de injeções.
+- **Verifique a lateralidade** (OD, OE, AO) e a quantidade de injeções indicadas.
+- No mapa de injeções, marque um ✅ no olho indicado.
+
+### Injeções Subsequentes
+
+- Contabilize os documentos de descrição cirúrgica presentes, cada injeção corresponde a 3 documentos adicionais.
+- No mapa, verifique quais injeções já foram realizadas e em quais olhos.
+
+### Última Injeção e Conclusão de Tratamento
+
+- Para a última injeção, marque com a letra R (de retorno) e preencha o formulário de retorno para os staffs da Retina com o motivo Pós AA.
+- Se todas as injeções prescritas foram realizadas, marque no mapa como (Concluído) e preencha um retorno.
 
 ## Tutorial: Emissão de Relatório no Integra
 
@@ -58,6 +74,8 @@ Para gerar um relatório no Integra adequado para uso com esta aplicação, siga
 
 ## Autoria e Créditos
 
-Esta aplicação foi desenvolvida por @leonunesbs. Para mais informações, contribuições ou suporte, por favor, acesse o [repositório do projeto no GitHub](https://github.com/leonunesbs).
+Desenvolvida por @leonunesbs. Para suporte ou mais informações, visite o [repositório no GitHub](https://github.com/leonunesbs).
 
-Caso tenha dúvidas ou sugestões, não hesite em entrar em contato com o desenvolvedor através do GitHub.
+Este manual combinado oferece uma visão abrangente e detalhada tanto da utilização da aplicação HGF Injeções quanto do
+
+procedimento para a checagem de prontuários, assegurando um processo mais eficiente e organizado para os profissionais envolvidos.
