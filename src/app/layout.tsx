@@ -1,10 +1,11 @@
 import '@/styles/globals.css';
 
 import { Metadata, Viewport } from 'next';
-import Head from 'next/head';
 
 export const metadata: Metadata = {
   title: `Vítreo - Relatório de Injeções`,
+  description: `Processa planilhas e gera relatórios.`,
+  category: 'technology',
   robots: {
     index: false,
     follow: true,
@@ -55,6 +56,14 @@ export const metadata: Metadata = {
     },
   },
   manifest: '/site.webmanifest',
+  appleWebApp: {
+    title: 'Vítreo',
+    statusBarStyle: 'black-translucent',
+  },
+  other: {
+    applicationName: 'Vítreo',
+    msapplicationTileColor: '#2b5797',
+  },
 };
 
 export const viewport: Viewport = {
@@ -71,11 +80,6 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-br">
-      <Head>
-        <meta name="apple-mobile-web-app-title" content="V&iacute;treo" />
-        <meta name="application-name" content="V&iacute;treo" />
-        <meta name="msapplication-TileColor" content="#2b5797" />
-      </Head>
       <body>{children}</body>
     </html>
   );

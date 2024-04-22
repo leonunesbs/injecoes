@@ -45,7 +45,7 @@ export function MainForm({}: MainFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="form-control">
         <label htmlFor="uploadedData" className="label label-text">
-          Arquivo XLS, XLXS ou CSV:
+          Arquivo XLS, XLSX ou CSV:
           <div className="join join-horizontal">
             <TbFileTypeXls className="h-5 w-5 join-item" />
             <TbFileTypeCsv className="h-5 w-5 join-item" />
