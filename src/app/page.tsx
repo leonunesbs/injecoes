@@ -38,7 +38,7 @@ export default function Page() {
             <div className="card-body">
               <div className="flex text-center w-full justify-center">
                 <Link
-                  href={'https://google.com'}
+                  href={'https://integrash.hgf.ce.gov.br/paciente/cs_relatorios.jsf'}
                   className="link link-primary flex items-center no-underline"
                   target="_blank"
                 >
