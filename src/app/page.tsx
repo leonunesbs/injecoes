@@ -26,7 +26,7 @@ export default function Page() {
                   width={100}
                   height={100}
                   priority
-                  blurDataURL="https://vitreo.in/logo.jpg"
+                  blurDataURL="https://injecoes.vercel.app/logo.jpg"
                   placeholder="blur"
                   quality={80}
                 />
@@ -38,7 +38,7 @@ export default function Page() {
             <div className="card-body">
               <div className="flex text-center w-full justify-center">
                 <Link
-                  href={'https://integrash.hgf.ce.gov.br/paciente/cs_relatorios.jsf'}
+                  href={'http://integrash.hgf.ce.gov.br/paciente/cs_relatorios.jsf'}
                   className="link link-primary flex items-center no-underline"
                   target="_blank"
                 >
