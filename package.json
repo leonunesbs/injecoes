@@ -39,7 +39,7 @@
   "devDependencies": {
     "@commitlint/cli": "19.2.2",
     "@commitlint/config-conventional": "19.2.2",
-    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@ianvs/prettier-plugin-sort-imports": "4.2.1",
     "@types/file-saver": "2.0.7",
     "@types/node": "20.12.7",
     "@types/nodemailer": "6.4.14",
