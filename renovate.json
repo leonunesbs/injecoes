@@ -9,5 +9,9 @@
       "packageNames": ["node"],
       "enabled": false
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  }
 }
