@@ -26,7 +26,7 @@ export default function Page() {
                   width={100}
                   height={100}
                   priority
-                  blurDataURL="https://injecoes.vercel.app/logo.jpg"
+                  blurDataURL="https://antivegf.vercel.app/logo.jpg"
                   placeholder="blur"
                   quality={80}
                 />

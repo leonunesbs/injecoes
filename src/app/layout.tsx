@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Vítreo Injeções',
     description: `Processa planilhas e gera relatórios.`,
-    url: 'https://injecoes.vercel.app',
+    url: 'https://antivegf.vercel.app',
     siteName: `Vítreo - Relatório de Injeções`,
     images: [
       {
-        url: 'https://injecoes.vercel.app/logo.jpg',
+        url: 'https://antivegf.vercel.app/logo.jpg',
         width: 400,
         height: 400,
       },
