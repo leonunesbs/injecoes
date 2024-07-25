@@ -51,16 +51,16 @@ A aplicação HGF Injeções foi desenvolvida para otimizar o processo de docume
 
 - Para a primeira injeção indicada, localize a última página de indicação de injeções.
 - **Verifique a lateralidade** (OD, OE, AO) e a quantidade de injeções indicadas.
-- No **MAPA** de injeções, marque um ✅ no olho indicado.
+- Na **PLANILHA** de injeções, marque um ✅ no olho indicado.
 
 ### Injeções Subsequentes
 
 - Contabilize os documentos de descrição cirúrgica presentes, cada injeção corresponde a 3 documentos adicionais.
-- Verifique quais injeções já foram realizadas e em quais olhos e cheque no **MAPA**.
+- Verifique quais injeções já foram realizadas e em quais olhos e cheque no **Planilha**.
 
 ### Última Injeção e Conclusão de Tratamento
 
-- Para a última injeção, cheque o **MAPA** e marque com a letra R (de retorno), preencha o formulário de retorno para os staffs da Retina com o motivo Pós AA.
+- Para a última injeção, cheque o **Planilha** e marque com a letra R (de retorno), preencha o formulário de retorno para os staffs da Retina com o motivo Pós AA.
 - Se todas as injeções prescritas foram realizadas, marque no mapa como **Concluído** e preencha um **retorno**.
 
 ## Tutorial: Emissão de Relatório no Integra
