@@ -30,8 +30,8 @@ importers:
         specifier: 7.53.0
         version: 7.53.0(react@18.2.0)
       react-icons:
-        specifier: 5.1.0
-        version: 5.1.0(react@18.2.0)
+        specifier: 5.3.0
+        version: 5.3.0(react@18.2.0)
       xlsx:
         specifier: 0.18.5
         version: 0.18.5
@@ -2011,8 +2011,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
 
-  react-icons@5.1.0:
-    resolution: {integrity: sha512-D3zug1270S4hbSlIRJ0CUS97QE1yNNKDjzQe3HqY0aefp2CBn9VgzgES27sRR2gOvFK+0CNx/BW0ggOESp6fqQ==}
+  react-icons@5.3.0:
+    resolution: {integrity: sha512-DnUk8aFbTyQPSkCfF8dbX6kQjXA9DktMeJqfjrg6cK9vwQVMxmcA3BfP4QoiztVmEHtwlTgLFsPuH2NskKT6eg==}
     peerDependencies:
       react: '*'
 
@@ -4644,7 +4644,7 @@ snapshots:
     dependencies:
       react: 18.2.0
 
-  react-icons@5.1.0(react@18.2.0):
+  react-icons@5.3.0(react@18.2.0):
     dependencies:
       react: 18.2.0
 
