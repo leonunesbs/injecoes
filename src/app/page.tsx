@@ -21,7 +21,7 @@ export default function Page() {
             <div className="avatar ">
               <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow">
                 <Image
-                  alt="Vítreo Logo"
+                  alt="AntiVEGF Logo"
                   src={'/logo.jpg'}
                   width={100}
                   height={100}

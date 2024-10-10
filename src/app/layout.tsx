@@ -3,7 +3,7 @@ import '@/styles/globals.css';
 import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-  title: `Vítreo - Relatório de Injeções`,
+  title: `AntiVEGF - Relatório de Injeções`,
   description: `Processa planilhas e gera relatórios.`,
   category: 'technology',
   robots: {
@@ -12,17 +12,17 @@ export const metadata: Metadata = {
     nocache: true,
   },
   generator: 'Next.js',
-  applicationName: `Vítreo - Relatório de Injeções`,
+  applicationName: `AntiVEGF - Relatório de Injeções`,
   referrer: 'origin-when-cross-origin',
   keywords: ['Next.js', 'React', 'JavaScript', 'HGF', 'njeções intravítreas'],
   authors: [{ name: 'Leonardo Nunes', url: 'https://github.com/leonunesbs' }],
   creator: 'Leonardo Nunes',
   publisher: 'Leonardo Nunes',
   openGraph: {
-    title: 'Vítreo Injeções',
+    title: 'AntiVEGF Injeções',
     description: `Processa planilhas e gera relatórios.`,
     url: 'https://antivegf.vercel.app',
-    siteName: `Vítreo - Relatório de Injeções`,
+    siteName: `AntiVEGF - Relatório de Injeções`,
     images: [
       {
         url: 'https://antivegf.vercel.app/logo.jpg',
@@ -57,11 +57,11 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   appleWebApp: {
-    title: 'Vítreo',
+    title: 'AntiVEGF',
     statusBarStyle: 'black-translucent',
   },
   other: {
-    applicationName: 'Vítreo',
+    applicationName: 'AntiVEGF',
     msapplicationTileColor: '#2b5797',
   },
 };
