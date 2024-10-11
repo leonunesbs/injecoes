@@ -3,45 +3,78 @@ import '@/styles/globals.css';
 import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-  title: `AntiVEGF - Relatório de Injeções`,
-  description: `Processa planilhas e gera relatórios.`,
-  category: 'technology',
+  title: 'AntiVEGF - Relatório de Injeções para Residentes do HGF',
+  description: `AntiVEGF é uma plataforma restrita ao serviço de oftalmologia do Hospital Geral de Fortaleza (HGF), projetada para auxiliar os médicos residentes em suas atividades diárias, permitindo a organização de relatórios de injeções intravítreas de forma prática e rápida.`,
+  category: 'medical, technology, healthcare',
   robots: {
     index: false,
-    follow: true,
+    follow: false,
     nocache: true,
   },
   generator: 'Next.js',
-  applicationName: `AntiVEGF - Relatório de Injeções`,
-  referrer: 'origin-when-cross-origin',
-  keywords: ['Next.js', 'React', 'JavaScript', 'HGF', 'njeções intravítreas'],
+  applicationName: 'AntiVEGF - Plataforma para Médicos Residentes',
+  referrer: 'no-referrer-when-downgrade',
+  keywords: [
+    'AntiVEGF',
+    'injeções intravítreas',
+    'oftalmologia',
+    'HGF',
+    'Hospital Geral de Fortaleza',
+    'residência médica',
+    'glaucoma',
+    'oftalmologia HGF',
+    'Next.js',
+    'JavaScript',
+    'planilhas médicas',
+    'relatórios médicos',
+  ],
   authors: [{ name: 'Leonardo Nunes', url: 'https://github.com/leonunesbs' }],
   creator: 'Leonardo Nunes',
   publisher: 'Leonardo Nunes',
   openGraph: {
-    title: 'AntiVEGF Injeções',
-    description: `Processa planilhas e gera relatórios.`,
+    title: 'AntiVEGF - Plataforma Médica para Relatórios de Injeções',
+    description:
+      'Plataforma restrita ao HGF para auxílio em relatórios de injeções intravítreas para médicos residentes.',
     url: 'https://antivegf.vercel.app',
-    siteName: `AntiVEGF - Relatório de Injeções`,
+    siteName: 'AntiVEGF - Plataforma para Residentes',
     images: [
       {
         url: 'https://antivegf.vercel.app/logo.jpg',
-        width: 400,
-        height: 400,
+        width: 1200,
+        height: 630,
+        alt: 'AntiVEGF - Relatórios Médicos para Residentes',
       },
     ],
     locale: 'pt_BR',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@hgf_ce',
+    title: 'AntiVEGF - Plataforma Médica',
+    description: 'Plataforma médica do HGF para organizar relatórios de injeções intravítreas.',
+    images: [
+      {
+        url: 'https://antivegf.vercel.app/logo.jpg',
+        alt: 'AntiVEGF - Plataforma Médica',
+      },
+    ],
+  },
+  alternates: {
+    canonical: 'https://antivegf.vercel.app',
+    languages: {
+      'pt-BR': 'https://antivegf.vercel.app',
+    },
+  },
   icons: {
     icon: [
       'favicon.ico',
       {
-        url: '/facicon-32x32.png',
+        url: '/favicon-32x32.png',
         sizes: '32x32',
       },
       {
-        url: '/facicon-16x16.png',
+        url: '/favicon-16x16.png',
         sizes: '16x16',
       },
     ],
@@ -60,9 +93,12 @@ export const metadata: Metadata = {
     title: 'AntiVEGF',
     statusBarStyle: 'black-translucent',
   },
-  other: {
-    applicationName: 'AntiVEGF',
-    msapplicationTileColor: '#2b5797',
+  themeColor: '#2570b5',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
   },
 };
 
@@ -79,8 +115,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-br">
-      <body>{children}</body>
+    <html lang="pt-BR">
+      <body className="min-h-screen bg-base-100 text-base-content antialiased">{children}</body>
     </html>
   );
 }

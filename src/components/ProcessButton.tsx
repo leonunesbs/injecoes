@@ -1,40 +1,93 @@
 'use client';
 
 import Link from 'next/link';
-import { FaBolt, FaCircleInfo, FaFileMedical } from 'react-icons/fa6';
+import { FaBolt, FaCircleInfo, FaFileMedical, FaPen, FaPlus } from 'react-icons/fa6';
 
 interface ProcessButtonProps {
   loading: boolean;
   url?: string;
+  onEdit?: () => void;
+  onNewReport?: () => void;
+  openButtonRef?: React.RefObject<HTMLButtonElement>; // Ref para gerenciar o foco
 }
 
-export function ProcessButton({ loading, url }: ProcessButtonProps) {
+export function ProcessButton({ loading, url, onEdit, onNewReport, openButtonRef }: ProcessButtonProps) {
   return (
-    <div className="join join-vertical w-full">
+    <div className="flex flex-col w-full space-y-2">
       {url ? (
+        <>
+          {/* Botão para visualizar o relatório */}
+          <button
+            type="button"
+            className="btn btn-accent w-full flex items-center justify-center"
+            onClick={() => {
+              window.open(url, '_blank');
+            }}
+            aria-label="Visualizar relatório gerado"
+            ref={openButtonRef} // Foco será retornado aqui após o fechamento do modal
+          >
+            <FaFileMedical className="h-5 w-5 mr-2" aria-hidden="true" />
+            Visualizar Relatório
+          </button>
+
+          {/* Botão para iniciar um novo relatório */}
+          <button
+            type="button"
+            className="btn btn-primary w-full flex items-center justify-center"
+            onClick={onNewReport}
+            aria-label="Iniciar novo relatório"
+          >
+            <FaPlus className="h-5 w-5 mr-2" aria-hidden="true" />
+            Novo Relatório
+          </button>
+        </>
+      ) : loading ? (
+        /* Botão de carregamento enquanto os dados estão sendo processados */
         <button
           type="button"
-          className="btn  btn-accent w-full join-item"
-          onClick={() => {
-            window.open(url, '_blank');
-          }}
+          className="btn btn-primary w-full flex items-center justify-center"
+          disabled
+          aria-label="Processamento em andamento, aguarde"
         >
-          <FaFileMedical className="h-4 w-4" />
-          Visualizar relatório
-        </button>
-      ) : loading ? (
-        <button type="button" className="btn  btn-primary w-full join-item">
-          <span className="loading loading-ring"></span>
-          Aguarde...
+          <span className="loading loading-ring mr-2" aria-hidden="true"></span>
+          Processando...
         </button>
       ) : (
-        <button type="submit" className="btn  btn-primary w-full join-item">
-          <FaBolt className="h-4 w-4" />
-          Processar
-        </button>
+        <>
+          {/* Botão de início para processar os dados */}
+          <button
+            type="submit"
+            className="btn btn-primary w-full flex items-center justify-center"
+            aria-label="Iniciar processamento dos dados"
+          >
+            <FaBolt className="h-5 w-5 mr-2" aria-hidden="true" />
+            Iniciar
+          </button>
+
+          {/* Botão para editar os dados antes de processar */}
+          {onEdit && (
+            <button
+              type="button"
+              className="btn btn-secondary w-full flex items-center justify-center"
+              onClick={onEdit}
+              aria-label="Editar os dados antes de processar"
+            >
+              <FaPen className="h-5 w-5 mr-2" aria-hidden="true" />
+              Editar Dados
+            </button>
+          )}
+        </>
       )}
-      <Link href={'https://bit.ly/4d3XjY3'} className="btn btn-ghost w-full join-item" target="_blank">
-        <FaCircleInfo className="h-4 w-4" />
+
+      {/* Link de ajuda */}
+      <Link
+        href={'https://bit.ly/4d3XjY3'}
+        className="btn btn-ghost w-full flex items-center justify-center"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Obter ajuda sobre como usar o sistema"
+      >
+        <FaCircleInfo className="h-5 w-5 mr-2" aria-hidden="true" />
         Ajuda
       </Link>
     </div>
