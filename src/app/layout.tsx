@@ -94,12 +94,6 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
   },
   themeColor: '#2570b5',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
 };
 
 export const viewport: Viewport = {

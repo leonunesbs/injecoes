@@ -41,5 +41,8 @@ export async function processFiles(file: FileList): Promise<Data[]> {
 
   await Promise.all(Array.from(file).map(readAndProcessFile));
 
+  // Ordena pelo nome do paciente (patientName)
+  processedData.sort((a, b) => (a.patientName > b.patientName ? 1 : -1));
+
   return processedData;
 }
