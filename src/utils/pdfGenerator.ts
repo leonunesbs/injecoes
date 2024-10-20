@@ -1,5 +1,5 @@
 // pdfGenerator.ts
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 import { MainFormData } from '@/components/MainForm';
 
@@ -49,25 +49,63 @@ export async function createPdfFromData(
 
   // Add a blank page at the beginning
   const blankPage = pdfDoc.addPage();
-  const { height } = blankPage.getSize();
+  const { width, height } = blankPage.getSize();
 
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
   blankPage.setFont(timesRomanFont);
   blankPage.setFontSize(12);
 
+  // Get today's date
+  const today = new Date().toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+
   // Write the headers
   let yPosition = height - 50; // Start from top
-  blankPage.drawText('Patient Summary', { x: 50, y: yPosition });
-  yPosition -= 20;
-  blankPage.drawText('Patient ID\tName\tNext Eye\tRemaining OD\tRemaining OS', { x: 50, y: yPosition });
+  blankPage.drawText(`Patient Summary - Remaining Doses - Date: ${today}`, { x: 50, y: yPosition });
+  yPosition -= 30;
+
+  // Header row
+  blankPage.drawText('Patient ID', { x: 50, y: yPosition });
+  blankPage.drawText('Name', { x: 120, y: yPosition });
+  blankPage.drawText('Next Eye', { x: 450, y: yPosition }); // Adjusted position
+  blankPage.drawText('OD', { x: 500, y: yPosition }); // Adjusted position
+  blankPage.drawText('OS', { x: 525, y: yPosition }); // Adjusted position
+  yPosition -= 10;
+
+  // Draw a line below the header
+  blankPage.drawLine({
+    start: { x: 50, y: yPosition },
+    end: { x: width - 50, y: yPosition },
+    thickness: 1,
+    color: rgb(0, 0, 0),
+  });
   yPosition -= 20;
 
-  // For each patient, write the data
-  for (const data of processedData) {
-    const line = `${data.refId}\t${data.patientName}\t${data.nextEye}\t${data.remainingOD}\t${data.remainingOS}`;
-    blankPage.drawText(line, { x: 50, y: yPosition });
-    yPosition -= 15; // Move down for next line
-  }
+  // For each patient, write the data in table format
+  processedData.forEach((data, index) => {
+    const lineY = yPosition - index * 20; // Adjust line height for each patient
+    blankPage.drawText(data.refId.toString(), { x: 50, y: lineY });
+    blankPage.drawText(data.patientName, { x: 120, y: lineY });
+    blankPage.drawText(data.nextEye, { x: 450, y: lineY }); // Adjusted position
+    blankPage.drawText(data.remainingOD?.toString() || '', { x: 500, y: lineY }); // Adjusted position
+    blankPage.drawText(data.remainingOS?.toString() || '', { x: 525, y: lineY }); // Adjusted position
+
+    // Draw a line to separate each row
+    blankPage.drawLine({
+      start: { x: 50, y: lineY - 5 },
+      end: { x: width - 50, y: lineY - 5 },
+      thickness: 0.5,
+      color: rgb(0.75, 0.75, 0.75),
+    });
+  });
+
+  // Add total number of patients at the bottom
+  const totalPatients = processedData.length;
+  yPosition -= totalPatients * 20 + 30;
+  blankPage.drawText(`Total Patients: ${totalPatients}`, { x: 50, y: yPosition });
 
   // Now, process each patient and add their pages
   for (const data of processedData) {
