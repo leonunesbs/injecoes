@@ -256,7 +256,7 @@ export function MainForm({}: MainFormProps) {
                       : (data.remainingOD ?? 0) < 0 || (data.remainingOS ?? 0) < 0
                         ? 'Erro'
                         : isLastInjection
-                          ? `Última Injeção (${lastInjectionEye})`
+                          ? `Última (${lastInjectionEye})`
                           : data.nextEye;
 
                   return (

@@ -99,7 +99,7 @@ export async function createPdfFromData(
         : (data.remainingOD ?? 0) < 0 || (data.remainingOS ?? 0) < 0
           ? 'Erro'
           : isLastInjection
-            ? `Última Injeção (${lastInjectionEye})`
+            ? `Última (${lastInjectionEye})`
             : data.nextEye;
 
     const odText = data.remainingOD?.toString() || '';
@@ -108,7 +108,7 @@ export async function createPdfFromData(
     blankPage.drawText(data.refId.toString(), { x: 50, y: lineY });
     blankPage.drawText(data.patientName, { x: 120, y: lineY });
 
-    // Exibir "Finalizou", "Erro", ou "Última Injeção" no campo próximo olho
+    // Exibir "Finalizou", "Erro", ou "Última" no campo próximo olho
     blankPage.drawText(nextEyeStatus || '', { x: 405, y: lineY });
     blankPage.drawText(odText, { x: 505, y: lineY });
     blankPage.drawText(osText, { x: 530, y: lineY });
