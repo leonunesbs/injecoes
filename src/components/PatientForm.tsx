@@ -51,7 +51,7 @@ export function PatientForm({}: PatientFormProps) {
           modal.showModal();
         }}
       >
-        Novo registro
+        Novo Registro
       </button>
 
       <dialog id="patient-form" className="modal">
