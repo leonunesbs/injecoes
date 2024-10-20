@@ -71,8 +71,8 @@ export async function createPdfFromData(
   blankPage.drawText('Patient ID', { x: 50, y: yPosition });
   blankPage.drawText('Name', { x: 120, y: yPosition });
   blankPage.drawText('Next Eye', { x: 405, y: yPosition }); // Adjusted position
-  blankPage.drawText('OD', { x: 500, y: yPosition }); // Adjusted position
-  blankPage.drawText('OS', { x: 525, y: yPosition }); // Adjusted position
+  blankPage.drawText('OD', { x: 505, y: yPosition }); // Adjusted position
+  blankPage.drawText('OS', { x: 530, y: yPosition }); // Adjusted position
   yPosition -= 10;
 
   // Draw a line below the header
@@ -110,8 +110,8 @@ export async function createPdfFromData(
 
     // Exibir "Finalizou", "Erro", ou "Última Injeção" no campo próximo olho
     blankPage.drawText(nextEyeStatus || '', { x: 405, y: lineY });
-    blankPage.drawText(odText, { x: 500, y: lineY });
-    blankPage.drawText(osText, { x: 525, y: lineY });
+    blankPage.drawText(odText, { x: 505, y: lineY });
+    blankPage.drawText(osText, { x: 530, y: lineY });
 
     // Linha separadora
     blankPage.drawLine({
