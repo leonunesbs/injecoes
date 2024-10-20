@@ -20,7 +20,7 @@ export default function Page() {
     <main>
       <PatientForm />
       <section>
-        <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto h-screen relative">
+        <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto min-h-[90vh] relative">
           <div className="mb-4 items-center flex flex-col space-y-4 text-center">
             <div className="avatar">
               <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow">
