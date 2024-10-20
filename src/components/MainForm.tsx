@@ -274,6 +274,13 @@ export function MainForm({}: MainFormProps) {
                   );
                 })}
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={5} className="text-right font-bold">
+                    Número de pacientes programados: {processedData.length}
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
           <div className="modal-action">
