@@ -93,7 +93,6 @@ export const metadata: Metadata = {
     title: 'AntiVEGF',
     statusBarStyle: 'black-translucent',
   },
-  themeColor: '#2570b5',
 };
 
 export const viewport: Viewport = {
@@ -101,8 +100,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#fff',
-
+  themeColor: '#2570b5',
   // Also supported by less commonly used
   // interactiveWidget: 'resizes-visual',
 };

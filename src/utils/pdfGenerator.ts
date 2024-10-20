@@ -1,11 +1,10 @@
+// pdfGenerator.ts
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
-import { Data } from '@/app/page';
+import { MainFormData } from '@/components/MainForm';
 
-export async function fillPdfTemplateWithData(
-  { patientId, patientName, staffName, procedureDate, treatmentType }: Data,
-  modelPDFBytes: ArrayBuffer
-) {
+export async function fillPdfTemplateWithData(data: MainFormData, modelPDFBytes: ArrayBuffer) {
+  const { patientId, patientName, staffName, procedureDate, treatmentType } = data;
   const pdfDoc = await PDFDocument.load(modelPDFBytes);
   const pages = pdfDoc.getPages();
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -19,7 +18,7 @@ export async function fillPdfTemplateWithData(
   pages[2].setFontSize(10);
   pages[2].setFont(timesRomanFont);
 
-  // página 1
+  // Page 1
   pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
   pages[0].drawText(patientId.toString(), { x: 475, y: 633 });
   pages[0].drawText(procedureDate.split(' ')[0], { x: 53, y: 483 });
@@ -27,13 +26,13 @@ export async function fillPdfTemplateWithData(
   pages[0].drawText(procedureDate.split(' ')[0], { x: 60, y: 110 });
   pages[0].drawText(treatmentType, { x: 50, y: 300 });
 
-  // página 2
+  // Page 2
   pages[1].drawText(patientName.toUpperCase(), { x: 100, y: 705 });
   pages[1].drawText(patientId.toString(), { x: 440, y: 705 });
   pages[1].drawText(procedureDate.split(' ')[0], { x: 45, y: 670 });
   pages[1].drawText(staffName.toUpperCase(), { x: 75, y: 640 });
 
-  // página 3
+  // Page 3
   pages[2].drawText(patientName.toUpperCase(), { x: 75, y: 330 });
   pages[2].drawText(procedureDate.split(' ')[0], { x: 345, y: 330 });
   pages[2].drawText(patientName.toUpperCase(), { x: 485, y: 330 });
@@ -42,8 +41,35 @@ export async function fillPdfTemplateWithData(
   return await pdfDoc.save();
 }
 
-export async function createPdfFromData(processedData: Data[], modelPDFBytes: ArrayBuffer): Promise<PDFDocument> {
+export async function createPdfFromData(
+  processedData: MainFormData[],
+  modelPDFBytes: ArrayBuffer
+): Promise<PDFDocument> {
   const pdfDoc = await PDFDocument.create();
+
+  // Add a blank page at the beginning
+  const blankPage = pdfDoc.addPage();
+  const { height } = blankPage.getSize();
+
+  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+  blankPage.setFont(timesRomanFont);
+  blankPage.setFontSize(12);
+
+  // Write the headers
+  let yPosition = height - 50; // Start from top
+  blankPage.drawText('Patient Summary', { x: 50, y: yPosition });
+  yPosition -= 20;
+  blankPage.drawText('Patient ID\tName\tNext Eye\tRemaining OD\tRemaining OS', { x: 50, y: yPosition });
+  yPosition -= 20;
+
+  // For each patient, write the data
+  for (const data of processedData) {
+    const line = `${data.patientId}\t${data.patientName}\t${data.nextEye}\t${data.remainingOD}\t${data.remainingOS}`;
+    blankPage.drawText(line, { x: 50, y: yPosition });
+    yPosition -= 15; // Move down for next line
+  }
+
+  // Now, process each patient and add their pages
   for (const data of processedData) {
     if (!data.patientName) continue;
     const newPdfBytes = await fillPdfTemplateWithData(data, modelPDFBytes);

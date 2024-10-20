@@ -4,13 +4,16 @@ import { RxExternalLink } from 'react-icons/rx';
 
 import { MainForm } from '@/components';
 
-export interface Data {
-  patientId: string | number;
+export type Data = {
+  patientId: string;
   patientName: string;
   staffName: string;
-  procedureDate: string;
   treatmentType: string;
-}
+  remainingOD?: number;
+  remainingOS?: number;
+  procedureDate: string;
+  // outros campos...
+};
 
 export default function Page() {
   return (

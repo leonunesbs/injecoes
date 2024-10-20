@@ -1,7 +1,15 @@
 import { parse as parseCSV, ParseResult } from 'papaparse';
 import * as XLSX from 'xlsx';
 
-import { Data } from '@/app/page';
+export interface Data {
+  patientId: string;
+  patientName: string;
+  staffName: string;
+  procedureDate: string;
+  treatmentType: string;
+}
+
+const startRow = 4;
 
 export async function processFiles(file: FileList): Promise<Data[]> {
   const processedData: Data[] = [];
@@ -27,7 +35,7 @@ export async function processFiles(file: FileList): Promise<Data[]> {
       return false;
     }
 
-    for (const row of rows.slice(4)) {
+    for (const row of rows.slice(startRow)) {
       const [patientId, , patientName, , , staffName, , procedureDate, , , treatmentType] = row;
       processedData.push({
         patientId: typeof patientId === 'number' ? String(patientId) : patientId,

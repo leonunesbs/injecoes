@@ -1,15 +1,15 @@
+// app/components/MainForm.tsx
 'use client';
 
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TbFileTypeCsv, TbFileTypeXls } from 'react-icons/tb';
 
-import { Data } from '@/app/page';
 import { processFiles } from '@/utils/fileProcessors';
+import { getPatientData } from '@/utils/getInjections';
 import { createPdfFromData, createPdfUrl } from '@/utils/pdfGenerator';
 import { sortPdfPages } from '@/utils/pdfSorter';
 import { ProcessButton } from './ProcessButton';
-import { ProgressBar } from './ProgressBar';
 
 interface MainFormProps {
   children?: ReactNode;
@@ -19,18 +19,31 @@ type Inputs = {
   uploadedData: FileList;
 };
 
+export type MainFormData = {
+  patientId: string;
+  patientName: string;
+  staffName: string;
+  treatmentType: string;
+  procedureDate: string;
+  remainingOD?: number;
+  remainingOS?: number;
+  isRegistered: boolean;
+  nextEye: string; // 'OD' or 'OS'
+  // other fields...
+};
+
 export function MainForm({}: MainFormProps) {
   const { register, handleSubmit, reset } = useForm<Inputs>({});
   const [url, setUrl] = useState('');
-  const [processedData, setProcessedData] = useState<Data[]>([]);
+  const [processedData, setProcessedData] = useState<MainFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [staffName, setStaffName] = useState('');
-  const [treatmentType, setTreatmentType] = useState(''); // Adiciona o estado para tratamento
+  const [treatmentType, setTreatmentType] = useState('');
   const modalRef = useRef<HTMLDialogElement>(null);
   const openButtonRef = useRef<HTMLButtonElement>(null);
 
-  async function sortAndSavePdf(processedData: Data[]): Promise<Uint8Array> {
+  async function sortAndSavePdf(processedData: MainFormData[]): Promise<Uint8Array> {
     const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
     const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
     const sortedPdf = await sortPdfPages(pdfDoc);
@@ -40,12 +53,52 @@ export function MainForm({}: MainFormProps) {
   const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData }) => {
     setLoading(true);
     const data = await processFiles(uploadedData);
-    setProcessedData(data);
 
-    // Extrair staffName e treatmentType da primeira entrada, se disponível
+    const updatedData = await Promise.all(
+      data.map(async (item) => {
+        const patient = await getPatientData(item.patientId);
+        let nextEye = '';
+        const remainingOD = patient?.remainingOD;
+        const remainingOS = patient?.remainingOS;
+        const isRegistered = patient != null;
+
+        if (patient) {
+          const lastInjection = patient.injections[0];
+
+          if (lastInjection) {
+            // Determine the next eye, which is contralateral to the last injection
+            if (lastInjection.OD > 0) {
+              nextEye = 'OS';
+            } else if (lastInjection.OS > 0) {
+              nextEye = 'OD';
+            } else {
+              // If last injection has both OD and OS zero, default to startOD
+              nextEye = patient.startOD ? 'OD' : 'OS';
+            }
+          } else {
+            // No last injection, use startOD
+            nextEye = patient.startOD ? 'OD' : 'OS';
+          }
+        } else {
+          // Patient not registered, default nextEye to empty string or some default value
+          nextEye = '';
+        }
+
+        return {
+          ...item,
+          remainingOD,
+          remainingOS,
+          isRegistered,
+          nextEye,
+        };
+      })
+    );
+    setProcessedData(updatedData);
+
+    // Extract staffName and treatmentType from the first entry, if available
     if (data.length > 0) {
       setStaffName(data[0].staffName);
-      setTreatmentType(data[0].treatmentType); // Define o tipo de tratamento para todas as entradas
+      setTreatmentType(data[0].treatmentType);
     }
 
     setLoading(false);
@@ -57,7 +110,7 @@ export function MainForm({}: MainFormProps) {
     modalRef.current?.close();
     setLoading(true);
 
-    // Atualizar todos os campos staffName e treatmentType com os valores atuais
+    // Update all staffName and treatmentType fields with current values
     const updatedData = processedData.map((item) => ({
       ...item,
       staffName: staffName,
@@ -76,14 +129,6 @@ export function MainForm({}: MainFormProps) {
     openButtonRef.current?.focus();
   };
 
-  const handleInputChange = (index: number, field: keyof Data, value: string) => {
-    setProcessedData((prevData) => {
-      const newData = [...prevData];
-      newData[index] = { ...newData[index], [field]: value };
-      return newData;
-    });
-  };
-
   const handleStaffNameChange = (value: string) => {
     setStaffName(value);
   };
@@ -93,23 +138,15 @@ export function MainForm({}: MainFormProps) {
   };
 
   const handleNewReport = () => {
-    // Redefinir todos os estados para os valores iniciais
+    // Reset all states to initial values
     setUrl('');
     setProcessedData([]);
     setIsProcessing(false);
     setLoading(false);
     setStaffName('');
-    setTreatmentType(''); // Resetar o tratamento
-    reset(); // Redefinir o formulário
+    setTreatmentType('');
+    reset();
   };
-
-  // Gerenciar o foco quando o modal é aberto
-  useEffect(() => {
-    if (modalRef.current && modalRef.current.open) {
-      const firstInput = modalRef.current.querySelector('#staffName') as HTMLInputElement;
-      firstInput?.focus();
-    }
-  }, [modalRef.current?.open]);
 
   return (
     <>
@@ -135,7 +172,7 @@ export function MainForm({}: MainFormProps) {
                 setUrl('');
                 setProcessedData([]);
                 setStaffName('');
-                setTreatmentType(''); // Resetar o tratamento
+                setTreatmentType('');
               },
             })}
             type="file"
@@ -150,7 +187,6 @@ export function MainForm({}: MainFormProps) {
             Selecione o arquivo contendo os dados dos pacientes.
           </small>
         </div>
-        <ProgressBar loading={loading || isProcessing} />
         <ProcessButton
           loading={loading || isProcessing}
           url={url}
@@ -212,43 +248,54 @@ export function MainForm({}: MainFormProps) {
 
           {/* Tabela de Dados */}
           <div className="overflow-x-auto" role="region" aria-label="Tabela de dados dos pacientes">
-            <table className="table table-compact w-full">
+            <table className="table table-zebra w-full">
               <thead>
                 <tr>
-                  <th>ID do Paciente</th>
-                  <th>Nome do Paciente</th>
+                  <th className="w-24">ID do Paciente</th>
+                  <th className="w-48">Nome do Paciente</th>
+                  <th>Injeções Restantes OD</th>
+                  <th>Injeções Restantes OS</th>
+                  <th>Próximo Olho</th>
                 </tr>
               </thead>
               <tbody>
                 {processedData.map((data, index) => (
                   <tr key={index}>
+                    <td>{data.patientId}</td>
+                    <td>{data.patientName}</td>
                     <td>
-                      <label htmlFor={`patientId-${index}`} className="sr-only">
-                        ID do Paciente
-                      </label>
-                      <input
-                        id={`patientId-${index}`}
-                        type="text"
-                        value={data.patientId}
-                        onChange={(e) => handleInputChange(index, 'patientId', e.target.value)}
-                        className="input input-bordered input-sm w-full"
-                      />
+                      {data.isRegistered ? (
+                        <span className="badge badge-info">{data.remainingOD}</span>
+                      ) : (
+                        <span className="text-gray-500 italic">Não cadastrado</span>
+                      )}
                     </td>
                     <td>
-                      <label htmlFor={`patientName-${index}`} className="sr-only">
-                        Nome do Paciente
-                      </label>
-                      <input
-                        id={`patientName-${index}`}
-                        type="text"
-                        value={data.patientName}
-                        onChange={(e) => handleInputChange(index, 'patientName', e.target.value)}
-                        className="input input-bordered input-sm w-full"
-                      />
+                      {data.isRegistered ? (
+                        <span className="badge badge-info">{data.remainingOS}</span>
+                      ) : (
+                        <span className="text-gray-500 italic">Não cadastrado</span>
+                      )}
+                    </td>
+                    <td>
+                      {data.isRegistered ? (
+                        <span>{data.nextEye}</span>
+                      ) : (
+                        <span className="text-gray-500 italic">N/A</span>
+                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
+              {/* Rodapé com informação total de pacientes */}
+              <tfoot>
+                <tr className="font-bold">
+                  <td colSpan={4} className="text-right">
+                    Total de Pacientes:
+                  </td>
+                  <td className="text-center">{processedData.length}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
 
