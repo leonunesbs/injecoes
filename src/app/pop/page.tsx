@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function PopPage() {
   return (
-    <article className="container mx-auto py-12 prose text-justify">
+    <article className="container mx-auto py-12 px-4 prose text-justify">
       <h1>Procedimento Operacional Padrão</h1>
 
       <p>
