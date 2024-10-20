@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FaBolt, FaCircleInfo, FaFileMedical, FaPen, FaPlus } from 'react-icons/fa6';
 
 interface ProcessButtonProps {
@@ -12,6 +13,13 @@ interface ProcessButtonProps {
 }
 
 export function ProcessButton({ loading, url, onEdit, onNewReport, openButtonRef }: ProcessButtonProps) {
+  const router = useRouter();
+  const handleOpenPdf = () => {
+    if (url) {
+      router.push(url); // Abrir em uma nova aba
+    }
+  };
+
   return (
     <div className="flex flex-col w-full space-y-2">
       {url ? (
@@ -20,9 +28,7 @@ export function ProcessButton({ loading, url, onEdit, onNewReport, openButtonRef
           <button
             type="button"
             className="btn btn-accent w-full flex items-center justify-center"
-            onClick={() => {
-              window.open(url, '_blank');
-            }}
+            onClick={handleOpenPdf} // Chama a função que cria o Blob e abre a nova aba
             aria-label="Visualizar relatório gerado"
             ref={openButtonRef} // Foco será retornado aqui após o fechamento do modal
           >
