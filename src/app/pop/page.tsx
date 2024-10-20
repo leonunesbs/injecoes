@@ -152,18 +152,14 @@ export default function PopPage() {
         Todos os profissionais envolvidos são obrigados a seguir rigorosamente os procedimentos estabelecidos e reportar
         qualquer inconformidade ao Comitê de Qualidade.
       </p>
-
+      <p className="mt-4 text-sm text-gray-500">
+        Última atualização: <time dateTime="2024-10-20">20 de outubro de 2024</time>
+      </p>
       <div className="flex justify-between mt-4">
         <Link href={'/'} className="btn btn-primary">
           Página Inicial
         </Link>
       </div>
-      {
-        // última atualização
-      }
-      <p className="mt-4 text-sm text-gray-500">
-        Última atualização: <time dateTime="2024-10-20">20 de outubro de 2024</time>
-      </p>
     </article>
   );
 }
