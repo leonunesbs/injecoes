@@ -245,15 +245,34 @@ export function MainForm({}: MainFormProps) {
                 </tr>
               </thead>
               <tbody>
-                {processedData.map((data, index) => (
-                  <tr key={index}>
-                    <td>{data.refId}</td>
-                    <td>{data.patientName}</td>
-                    <td>{data.remainingOD ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
-                    <td>{data.remainingOS ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
-                    <td>{data.nextEye || <span className="text-gray-500 italic">N/A</span>}</td>
-                  </tr>
-                ))}
+                {processedData.map((data, index) => {
+                  const isLastInjection = (data.remainingOD || 0) + (data.remainingOS || 0) === 1;
+                  const lastInjectionEye = data.remainingOD === 1 ? 'OD' : data.remainingOS === 1 ? 'OS' : '';
+
+                  // Verificação para "Finalizou" ou "Erro"
+                  const nextEyeStatus =
+                    data.remainingOD === 0 && data.remainingOS === 0
+                      ? 'Finalizou'
+                      : (data.remainingOD ?? 0) < 0 || (data.remainingOS ?? 0) < 0
+                        ? 'Erro'
+                        : isLastInjection
+                          ? `Última Injeção (${lastInjectionEye})`
+                          : data.nextEye;
+
+                  return (
+                    <tr key={index}>
+                      <td>{data.refId}</td>
+                      <td>{data.patientName}</td>
+                      <td>{data.remainingOD ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
+                      <td>{data.remainingOS ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
+                      <td>
+                        <span className={nextEyeStatus === 'Erro' ? 'text-red-600 font-bold' : ''}>
+                          {nextEyeStatus || <span className="text-gray-500 italic">N/A</span>}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

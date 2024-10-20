@@ -86,14 +86,34 @@ export async function createPdfFromData(
 
   // For each patient, write the data in table format
   processedData.forEach((data, index) => {
-    const lineY = yPosition - index * 20; // Adjust line height for each patient
+    const lineY = yPosition - index * 20;
+
+    // Verificação se a soma das injeções restantes é igual a 1
+    const isLastInjection = (data.remainingOD || 0) + (data.remainingOS || 0) === 1;
+    const lastInjectionEye = data.remainingOD === 1 ? 'OD' : data.remainingOS === 1 ? 'OS' : '';
+
+    // Verificação para "Finalizou" ou "Erro"
+    const nextEyeStatus =
+      data.remainingOD === 0 && data.remainingOS === 0
+        ? 'Finalizou'
+        : (data.remainingOD ?? 0) < 0 || (data.remainingOS ?? 0) < 0
+          ? 'Erro'
+          : isLastInjection
+            ? `Última Injeção (${lastInjectionEye})`
+            : data.nextEye;
+
+    const odText = data.remainingOD?.toString() || '';
+    const osText = data.remainingOS?.toString() || '';
+
     blankPage.drawText(data.refId.toString(), { x: 50, y: lineY });
     blankPage.drawText(data.patientName, { x: 120, y: lineY });
-    blankPage.drawText(data.nextEye, { x: 450, y: lineY }); // Adjusted position
-    blankPage.drawText(data.remainingOD?.toString() || '', { x: 500, y: lineY }); // Adjusted position
-    blankPage.drawText(data.remainingOS?.toString() || '', { x: 525, y: lineY }); // Adjusted position
 
-    // Draw a line to separate each row
+    // Exibir "Finalizou", "Erro", ou "Última Injeção" no campo próximo olho
+    blankPage.drawText(nextEyeStatus || '', { x: 450, y: lineY });
+    blankPage.drawText(odText, { x: 500, y: lineY });
+    blankPage.drawText(osText, { x: 525, y: lineY });
+
+    // Linha separadora
     blankPage.drawLine({
       start: { x: 50, y: lineY - 5 },
       end: { x: width - 50, y: lineY - 5 },
