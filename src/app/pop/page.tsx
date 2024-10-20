@@ -1,5 +1,44 @@
 // src/app/pop/page.tsx
+import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'POP - Procedimento Operacional Padrão para Injeções Intravítreas',
+  description: `Procedimento Operacional Padrão (POP) para a execução de injeções intravítreas no Setor de Oftalmologia do Hospital Geral de Fortaleza, garantindo segurança e precisão no acompanhamento dos pacientes.`,
+  keywords: [
+    'POP oftalmologia',
+    'injeções intravítreas',
+    'procedimentos médicos',
+    'Oftalmologia HGF',
+    'procedimento operacional padrão',
+    'retina',
+    'hospital',
+  ],
+  openGraph: {
+    title: 'POP - Procedimento Operacional Padrão para Injeções Intravítreas',
+    description:
+      'Guia detalhado dos procedimentos para injeções intravítreas no Setor de Oftalmologia do Hospital Geral de Fortaleza (HGF).',
+    url: 'https://antivegf.vercel.app/pop',
+    siteName: 'POP - Setor de Oftalmologia HGF',
+    images: [
+      {
+        url: 'https://antivegf.vercel.app/pop-logo.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'POP - Injeções Intravítreas',
+      },
+    ],
+    locale: 'pt_BR',
+    type: 'article',
+  },
+
+  alternates: {
+    canonical: 'https://antivegf.vercel.app/pop',
+    languages: {
+      'pt-BR': 'https://antivegf.vercel.app/pop',
+    },
+  },
+};
 
 export default function PopPage() {
   return (
