@@ -158,6 +158,12 @@ export default function PopPage() {
           Página Inicial
         </Link>
       </div>
+      {
+        // última atualização
+      }
+      <p className="mt-4 text-sm text-gray-500">
+        Última atualização: <time dateTime="2024-10-20">20 de outubro de 2024</time>
+      </p>
     </article>
   );
 }
