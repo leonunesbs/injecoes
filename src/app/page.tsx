@@ -2,10 +2,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { RxExternalLink } from 'react-icons/rx';
 
-import { MainForm } from '@/components';
+import { MainForm, PatientForm } from '@/components';
 
 export type Data = {
-  patientId: string;
+  refId: string;
   patientName: string;
   staffName: string;
   treatmentType: string;
@@ -18,10 +18,11 @@ export type Data = {
 export default function Page() {
   return (
     <main>
+      <PatientForm />
       <section>
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen relative">
+        <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto h-screen relative">
           <div className="mb-4 items-center flex flex-col space-y-4 text-center">
-            <div className="avatar ">
+            <div className="avatar">
               <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow">
                 <Image
                   alt="AntiVEGF Logo"

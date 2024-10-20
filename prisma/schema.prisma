@@ -15,7 +15,7 @@ datasource db {
 
 model Patient {
   id          String  @id @default(cuid())
-  patientId   String  @unique
+  refId       String  @unique
   remainingOD Int     @default(0)
   remainingOS Int     @default(0)
   startOD     Boolean @default(true)
@@ -30,5 +30,5 @@ model Injection {
   OD        Int      @default(0)
   OS        Int      @default(0)
 
-  patient Patient @relation(fields: [patientId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 }

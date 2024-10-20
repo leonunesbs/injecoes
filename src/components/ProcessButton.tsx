@@ -2,17 +2,16 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaBolt, FaCircleInfo, FaFileMedical, FaPen, FaPlus } from 'react-icons/fa6';
+import { FaBolt, FaCircleInfo, FaFileMedical, FaPlus } from 'react-icons/fa6';
 
 interface ProcessButtonProps {
   loading: boolean;
   url?: string;
-  onEdit?: () => void;
   onNewReport?: () => void;
   openButtonRef?: React.RefObject<HTMLButtonElement>; // Ref para gerenciar o foco
 }
 
-export function ProcessButton({ loading, url, onEdit, onNewReport, openButtonRef }: ProcessButtonProps) {
+export function ProcessButton({ loading, url, onNewReport, openButtonRef }: ProcessButtonProps) {
   const router = useRouter();
   const handleOpenPdf = () => {
     if (url) {
@@ -69,19 +68,6 @@ export function ProcessButton({ loading, url, onEdit, onNewReport, openButtonRef
             <FaBolt className="h-5 w-5 mr-2" aria-hidden="true" />
             Iniciar
           </button>
-
-          {/* Botão para editar os dados antes de processar */}
-          {onEdit && (
-            <button
-              type="button"
-              className="btn btn-secondary w-full flex items-center justify-center"
-              onClick={onEdit}
-              aria-label="Editar os dados antes de processar"
-            >
-              <FaPen className="h-5 w-5 mr-2" aria-hidden="true" />
-              Editar Dados
-            </button>
-          )}
         </>
       )}
 

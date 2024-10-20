@@ -4,7 +4,7 @@ import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { MainFormData } from '@/components/MainForm';
 
 export async function fillPdfTemplateWithData(data: MainFormData, modelPDFBytes: ArrayBuffer) {
-  const { patientId, patientName, staffName, procedureDate, treatmentType } = data;
+  const { refId, patientName, staffName, procedureDate, treatmentType } = data;
   const pdfDoc = await PDFDocument.load(modelPDFBytes);
   const pages = pdfDoc.getPages();
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -20,7 +20,7 @@ export async function fillPdfTemplateWithData(data: MainFormData, modelPDFBytes:
 
   // Page 1
   pages[0].drawText(patientName.toUpperCase(), { x: 100, y: 633 });
-  pages[0].drawText(patientId.toString(), { x: 475, y: 633 });
+  pages[0].drawText(refId.toString(), { x: 475, y: 633 });
   pages[0].drawText(procedureDate.split(' ')[0], { x: 53, y: 483 });
   pages[0].drawText(procedureDate.split(' ')[0], { x: 215, y: 483 });
   pages[0].drawText(procedureDate.split(' ')[0], { x: 60, y: 110 });
@@ -28,7 +28,7 @@ export async function fillPdfTemplateWithData(data: MainFormData, modelPDFBytes:
 
   // Page 2
   pages[1].drawText(patientName.toUpperCase(), { x: 100, y: 705 });
-  pages[1].drawText(patientId.toString(), { x: 440, y: 705 });
+  pages[1].drawText(refId.toString(), { x: 440, y: 705 });
   pages[1].drawText(procedureDate.split(' ')[0], { x: 45, y: 670 });
   pages[1].drawText(staffName.toUpperCase(), { x: 75, y: 640 });
 
@@ -64,7 +64,7 @@ export async function createPdfFromData(
 
   // For each patient, write the data
   for (const data of processedData) {
-    const line = `${data.patientId}\t${data.patientName}\t${data.nextEye}\t${data.remainingOD}\t${data.remainingOS}`;
+    const line = `${data.refId}\t${data.patientName}\t${data.nextEye}\t${data.remainingOD}\t${data.remainingOS}`;
     blankPage.drawText(line, { x: 50, y: yPosition });
     yPosition -= 15; // Move down for next line
   }

@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 
 import prisma from '@/lib/prisma';
 
-export async function getPatientsData(patientIds: string[]): Promise<
+export async function getPatientsData(refIds: string[]): Promise<
   Prisma.PatientGetPayload<{
     include: {
       injections: true;
@@ -16,8 +16,8 @@ export async function getPatientsData(patientIds: string[]): Promise<
 
   const patients = await prisma.patient.findMany({
     where: {
-      patientId: {
-        in: patientIds,
+      refId: {
+        in: refIds,
       },
     },
     include: {
@@ -31,7 +31,7 @@ export async function getPatientsData(patientIds: string[]): Promise<
   return patients;
 }
 
-export async function updatePatientInjections(patientId: string, nextEye: 'OD' | 'OS'): Promise<void> {
+export async function updatePatientInjections(refId: string, nextEye: 'OD' | 'OS'): Promise<void> {
   'use server';
 
   // Atualiza o paciente e cria a injeção dentro de uma única transação
@@ -39,7 +39,7 @@ export async function updatePatientInjections(patientId: string, nextEye: 'OD' |
     // Atualiza o olho correto (OD ou OS)
     if (nextEye === 'OD') {
       await prisma.patient.update({
-        where: { patientId },
+        where: { refId },
         data: {
           remainingOD: {
             decrement: 1,
@@ -48,7 +48,7 @@ export async function updatePatientInjections(patientId: string, nextEye: 'OD' |
       });
     } else if (nextEye === 'OS') {
       await prisma.patient.update({
-        where: { patientId },
+        where: { refId },
         data: {
           remainingOS: {
             decrement: 1,
@@ -62,7 +62,7 @@ export async function updatePatientInjections(patientId: string, nextEye: 'OD' |
       data: {
         patient: {
           connect: {
-            patientId,
+            refId,
           },
         },
         date: new Date(),

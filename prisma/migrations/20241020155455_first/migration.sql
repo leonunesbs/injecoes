@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "Patient" (
     "id" TEXT NOT NULL,
-    "patientId" TEXT NOT NULL,
+    "refId" TEXT NOT NULL,
     "remainingOD" INTEGER NOT NULL DEFAULT 0,
     "remainingOS" INTEGER NOT NULL DEFAULT 0,
     "startOD" BOOLEAN NOT NULL DEFAULT true,
@@ -20,5 +20,8 @@ CREATE TABLE "Injection" (
     CONSTRAINT "Injection_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Patient_refId_key" ON "Patient"("refId");
+
 -- AddForeignKey
-ALTER TABLE "Injection" ADD CONSTRAINT "Injection_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "Patient"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Injection" ADD CONSTRAINT "Injection_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "Patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
