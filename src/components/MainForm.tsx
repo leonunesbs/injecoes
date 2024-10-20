@@ -1,4 +1,4 @@
-// app/components/MainForm.tsx
+// src/app/components/MainForm.tsx
 'use client';
 
 import { ReactNode, useRef, useState } from 'react';
@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { TbFileTypeCsv, TbFileTypeXls } from 'react-icons/tb';
 
 import { processFiles } from '@/utils/fileProcessors';
-import { getPatientData } from '@/utils/getInjections';
+import { getPatientsData, updatePatientInjections } from '@/utils/manageInjections';
 import { createPdfFromData, createPdfUrl } from '@/utils/pdfGenerator';
 import { sortPdfPages } from '@/utils/pdfSorter';
 import { ProcessButton } from './ProcessButton';
@@ -29,12 +29,11 @@ export type MainFormData = {
   remainingOS?: number;
   isRegistered: boolean;
   nextEye: string; // 'OD' or 'OS'
-  // other fields...
 };
 
 export function MainForm({}: MainFormProps) {
   const { register, handleSubmit, reset } = useForm<Inputs>({});
-  const [url, setUrl] = useState('');
+  const [blobUrl, setBlobUrl] = useState<string | undefined>();
   const [processedData, setProcessedData] = useState<MainFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -43,6 +42,11 @@ export function MainForm({}: MainFormProps) {
   const modalRef = useRef<HTMLDialogElement>(null);
   const openButtonRef = useRef<HTMLButtonElement>(null);
 
+  /**
+   * Ordena e salva o PDF com os dados processados.
+   * @param processedData - A lista de dados dos pacientes.
+   * @returns Os bytes do PDF ordenado.
+   */
   async function sortAndSavePdf(processedData: MainFormData[]): Promise<Uint8Array> {
     const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
     const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
@@ -50,13 +54,18 @@ export function MainForm({}: MainFormProps) {
     return sortedPdf.save();
   }
 
+  /**
+   * Função chamada ao submeter o formulário.
+   * Processa os arquivos, obtém os dados dos pacientes e prepara para a visualização.
+   * @param uploadedData - Os arquivos carregados pelo usuário.
+   */
   const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData }) => {
     setLoading(true);
     const data = await processFiles(uploadedData);
 
-    const updatedData = await Promise.all(
-      data.map(async (item) => {
-        const patient = await getPatientData(item.patientId);
+    const updatedData = await getPatientsData(data.map((item) => item.patientId)).then((patients) => {
+      return data.map((item) => {
+        const patient = patients.find((p) => p.patientId === item.patientId);
         let nextEye = '';
         const remainingOD = patient?.remainingOD;
         const remainingOS = patient?.remainingOS;
@@ -66,21 +75,21 @@ export function MainForm({}: MainFormProps) {
           const lastInjection = patient.injections[0];
 
           if (lastInjection) {
-            // Determine the next eye, which is contralateral to the last injection
+            // Determinar o próximo olho, contralateral ao último aplicado
             if (lastInjection.OD > 0) {
               nextEye = 'OS';
             } else if (lastInjection.OS > 0) {
               nextEye = 'OD';
             } else {
-              // If last injection has both OD and OS zero, default to startOD
+              // Se ambas as injeções estiverem zero, usar startOD
               nextEye = patient.startOD ? 'OD' : 'OS';
             }
           } else {
-            // No last injection, use startOD
+            // Sem última aplicação, usar startOD
             nextEye = patient.startOD ? 'OD' : 'OS';
           }
         } else {
-          // Patient not registered, default nextEye to empty string or some default value
+          // Paciente não cadastrado
           nextEye = '';
         }
 
@@ -91,11 +100,12 @@ export function MainForm({}: MainFormProps) {
           isRegistered,
           nextEye,
         };
-      })
-    );
+      });
+    });
+
     setProcessedData(updatedData);
 
-    // Extract staffName and treatmentType from the first entry, if available
+    // Extrair staffName e treatmentType da primeira entrada, se disponível
     if (data.length > 0) {
       setStaffName(data[0].staffName);
       setTreatmentType(data[0].treatmentType);
@@ -105,41 +115,78 @@ export function MainForm({}: MainFormProps) {
     modalRef.current?.showModal();
   };
 
+  /**
+   * Função chamada ao clicar no botão "Processar".
+   * Atualiza as injeções restantes e cria registros de injeção no banco de dados.
+   */
   const handleProcess = async () => {
     setIsProcessing(true);
     modalRef.current?.close();
     setLoading(true);
 
-    // Update all staffName and treatmentType fields with current values
+    // Atualizar todos os campos staffName e treatmentType com os valores atuais
     const updatedData = processedData.map((item) => ({
       ...item,
       staffName: staffName,
       treatmentType: treatmentType,
     }));
-    const sortedPdfBytes = await sortAndSavePdf(updatedData);
-    const pdfUrl = createPdfUrl(sortedPdfBytes);
-    setUrl(pdfUrl);
-    setLoading(false);
-    setIsProcessing(false);
-    openButtonRef.current?.focus();
+
+    try {
+      // Para cada paciente, debitar a injeção no olho correto e criar um registro
+      await Promise.all(
+        updatedData.map(async (item) => {
+          if (item.isRegistered && item.nextEye) {
+            await updatePatientInjections(item.patientId, item.nextEye as 'OD' | 'OS');
+          }
+        })
+      );
+
+      // Gerar o PDF
+      const sortedPdfBytes = await sortAndSavePdf(updatedData);
+
+      // Criar a URL do Blob para visualização
+      const pdfBlobUrl = createPdfUrl(sortedPdfBytes);
+      setBlobUrl(pdfBlobUrl);
+    } catch (error) {
+      console.error(error);
+      alert('Ocorreu um erro ao processar os dados dos pacientes.');
+    } finally {
+      setLoading(false);
+      setIsProcessing(false);
+      openButtonRef.current?.focus();
+    }
   };
 
+  /**
+   * Função para fechar o modal.
+   */
   const handleClose = () => {
     modalRef.current?.close();
     openButtonRef.current?.focus();
   };
 
+  /**
+   * Função para lidar com mudanças no campo "Nome do Profissional".
+   * @param value - O novo valor do campo.
+   */
   const handleStaffNameChange = (value: string) => {
     setStaffName(value);
   };
 
+  /**
+   * Função para lidar com mudanças no campo "Tipo de Tratamento".
+   * @param value - O novo valor do campo.
+   */
   const handleTreatmentTypeChange = (value: string) => {
     setTreatmentType(value);
   };
 
+  /**
+   * Função para iniciar um novo relatório.
+   */
   const handleNewReport = () => {
-    // Reset all states to initial values
-    setUrl('');
+    // Resetar todos os estados para os valores iniciais
+    setBlobUrl(undefined);
     setProcessedData([]);
     setIsProcessing(false);
     setLoading(false);
@@ -161,15 +208,15 @@ export function MainForm({}: MainFormProps) {
               Arquivo XLS, XLSX ou CSV:
             </label>
             <div className="flex items-center space-x-2 mt-2">
-              <TbFileTypeXls className="h-6 w-6" aria-hidden="true" focusable="false" />
-              <TbFileTypeCsv className="h-6 w-6" aria-hidden="true" focusable="false" />
+              <TbFileTypeXls className="h-6 w-6" aria-hidden="true" />
+              <TbFileTypeCsv className="h-6 w-6" aria-hidden="true" />
             </div>
           </div>
           <input
             {...register('uploadedData', {
               onChange: () => {
                 setLoading(false);
-                setUrl('');
+                setBlobUrl(undefined); // Resetar a URL do Blob ao carregar um novo arquivo
                 setProcessedData([]);
                 setStaffName('');
                 setTreatmentType('');
@@ -189,7 +236,7 @@ export function MainForm({}: MainFormProps) {
         </div>
         <ProcessButton
           loading={loading || isProcessing}
-          url={url}
+          url={blobUrl}
           onEdit={() => modalRef.current?.showModal()}
           onNewReport={handleNewReport}
           openButtonRef={openButtonRef}
