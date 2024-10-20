@@ -52,12 +52,6 @@ export default function Page() {
               <MainForm />
             </div>
           </div>
-          <span className="absolute bottom-0 bg-primary text-primary-content w-full text-center text-xs py-1">
-            Coded with ❤️ by{' '}
-            <Link href={'https://github.com/leonunesbs'} className="link no-underline  font-bold" target="_blank">
-              @leonunesbs
-            </Link>
-          </span>
         </div>
       </section>
     </main>

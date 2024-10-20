@@ -73,10 +73,8 @@ export function ProcessButton({ loading, url, onNewReport, openButtonRef }: Proc
 
       {/* Link de ajuda */}
       <Link
-        href={'https://bit.ly/4d3XjY3'}
+        href={'/pop'}
         className="btn btn-ghost w-full flex items-center justify-center"
-        target="_blank"
-        rel="noopener noreferrer"
         aria-label="Obter ajuda sobre como usar o sistema"
       >
         <FaCircleInfo className="h-5 w-5 mr-2" aria-hidden="true" />
