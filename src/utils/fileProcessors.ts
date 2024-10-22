@@ -9,7 +9,7 @@ export interface Data {
   treatmentType: string;
 }
 
-const startRow = 4;
+const startRow = 0;
 
 export async function processFiles(file: FileList): Promise<Data[]> {
   const processedData: Data[] = [];
@@ -36,7 +36,16 @@ export async function processFiles(file: FileList): Promise<Data[]> {
     }
 
     for (const row of rows.slice(startRow)) {
-      const [refId, , patientName, , , staffName, , procedureDate, , , treatmentType] = row;
+      const [refId, , patientName, , , staffName, , procedureDate, , , treatmentType, status] = row;
+      console.log(status);
+      if (status === 'CANCELADO') {
+        continue;
+      }
+      // descarta linhas sem refId ou com refId não numérico
+      if (!refId || isNaN(Number(refId))) {
+        continue;
+      }
+
       processedData.push({
         refId: typeof refId === 'number' ? String(refId) : refId,
         patientName,
