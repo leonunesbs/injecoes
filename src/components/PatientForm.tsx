@@ -4,7 +4,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { createOrUpdatePatient } from '@/utils/getInjections';
@@ -16,13 +16,7 @@ const patientSchema = z.object({
     .min(1, 'O ID do Paciente não pode ser vazio')
     .regex(/^\d+$/, 'O ID do Paciente deve ser um número natural')
     .transform((val) => val.replace(/^0+/, '')), // Remove zeros à esquerda
-  remainingOD: z
-    .number({
-      required_error: 'O campo é obrigatório',
-      invalid_type_error: 'O valor deve ser um número',
-    })
-    .min(0, 'Valor não pode ser negativo')
-    .default(0),
+  remainingOD: z.number().min(0, 'Valor não pode ser negativo').default(0),
   remainingOS: z
     .number({
       required_error: 'O campo é obrigatório',
@@ -36,32 +30,43 @@ const patientSchema = z.object({
 type FormData = z.infer<typeof patientSchema>;
 
 export function PatientForm() {
-  const [eye, setEye] = useState<'OD' | 'OS'>('OD');
   const [loading, setLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
   const {
     register,
     handleSubmit,
     reset,
+    control, // Added control for Controller usage
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(patientSchema),
     defaultValues: {
       remainingOD: 0,
       remainingOS: 0,
+      startEye: 'OD', // Default to 'OD'
     },
   });
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToastMessage(message);
+    setToastType(type);
+    setTimeout(() => setToastMessage(null), 3000); // Toast disappears after 3 seconds
+  };
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      await createOrUpdatePatient({ ...data, startEye: eye });
+      await createOrUpdatePatient(data);
       console.log('Form submitted:', data);
       reset();
+      showToast('Paciente salvo com sucesso!', 'success');
       const modal = document.getElementById('patient-form') as HTMLDialogElement;
       modal.close();
     } catch (error) {
       console.error('Failed to submit:', error);
+      showToast('Falha ao salvar o paciente.', 'error');
     } finally {
       setLoading(false);
     }
@@ -69,6 +74,14 @@ export function PatientForm() {
 
   return (
     <div className="flex justify-end p-4">
+      {!toastMessage && (
+        <div className={`toast toast-${toastType} fixed bottom-4 right-4 z-50`}>
+          <div className={`alert alert-${toastType}`}>
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
       <button
         className="btn btn-primary btn-outline top-4 right-4 z-auto"
         onClick={() => {
@@ -146,17 +159,23 @@ export function PatientForm() {
               )}
             </div>
 
-            {/* Olho de Início */}
+            {/* Olho de Início (Using Controller) */}
             <div className="flex items-center">
               <span className="label-text mr-4">Olho de Início:</span>
-              <input
-                type="checkbox"
-                className="toggle toggle-primary"
-                onChange={() => setEye(eye === 'OD' ? 'OS' : 'OD')}
-                checked={eye === 'OD'}
-                aria-label={`Olho de início selecionado: ${eye}`}
+              <Controller
+                name="startEye"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    onChange={() => field.onChange(field.value === 'OD' ? 'OS' : 'OD')}
+                    checked={field.value === 'OD'}
+                    aria-label={`Olho de início selecionado: ${field.value}`}
+                  />
+                )}
               />
-              <span className="ml-2">{eye === 'OD' ? 'OD' : 'OS'}</span>
+              <span className="ml-2">{control._formValues.startEye === 'OD' ? 'OD' : 'OS'}</span>
             </div>
 
             {/* Botões de ação */}
