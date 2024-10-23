@@ -74,7 +74,7 @@ export function PatientForm() {
 
   return (
     <div className="flex justify-end p-4">
-      {!toastMessage && (
+      {toastMessage && (
         <div className={`toast toast-${toastType} fixed bottom-4 right-4 z-50`}>
           <div className={`alert alert-${toastType}`}>
             <span>{toastMessage}</span>
