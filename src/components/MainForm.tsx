@@ -40,6 +40,7 @@ export function MainForm({}: MainFormProps) {
   const [staffName, setStaffName] = useState('');
   const [treatmentType, setTreatmentType] = useState('');
   const modalRef = useRef<HTMLDialogElement>(null);
+  const confirmModalRef = useRef<HTMLDialogElement>(null);
   const openButtonRef = useRef<HTMLButtonElement>(null);
 
   /**
@@ -53,13 +54,11 @@ export function MainForm({}: MainFormProps) {
     const { injections, remainingOD, remainingOS, startOD } = patient;
     const lastInjection = injections[0];
 
-    // Determinar o próximo olho baseado na última injeção
     if (lastInjection) {
       if (lastInjection.OD > 0 && remainingOS) return 'OS';
       if (lastInjection.OS > 0 && remainingOD) return 'OD';
     }
 
-    // Caso não haja última aplicação ou ambos estejam zerados, usar startOD
     return startOD && remainingOD ? 'OD' : 'OS';
   };
 
@@ -93,7 +92,6 @@ export function MainForm({}: MainFormProps) {
       const data = await processFiles(uploadedData);
       const updatedData = await processPatientData(data);
 
-      // Atualizar os campos staffName e treatmentType
       if (data.length > 0) {
         setStaffName(data[0].staffName);
         setTreatmentType(data[0].treatmentType);
@@ -118,13 +116,11 @@ export function MainForm({}: MainFormProps) {
   };
 
   /**
-   * Função para processar as injeções e gerar PDF
+   * Função para processar as injeções e gerar PDF após confirmação
    */
-  const handleProcess = async () => {
-    setIsProcessing(true);
-    modalRef.current?.close();
+  const handleConfirmProcess = async () => {
+    confirmModalRef.current?.close();
     setLoading(true);
-
     const updatedData = processedData.map((item) => ({
       ...item,
       staffName,
@@ -153,9 +149,19 @@ export function MainForm({}: MainFormProps) {
     }
   };
 
+  const handleProcess = () => {
+    modalRef.current?.close();
+    confirmModalRef.current?.showModal();
+  };
+
   const handleClose = () => {
     modalRef.current?.close();
     openButtonRef.current?.focus();
+  };
+
+  const handleCloseConfirm = () => {
+    confirmModalRef.current?.close();
+    modalRef.current?.showModal();
   };
 
   const resetForm = () => {
@@ -205,7 +211,7 @@ export function MainForm({}: MainFormProps) {
         />
       </form>
 
-      {/* Modal */}
+      {/* Modal Inicial */}
       <dialog ref={modalRef} className="modal">
         <form method="dialog" className="modal-box w-full max-w-5xl">
           <h3 className="font-bold text-xl mb-4 text-center">Verifique e Edite os Dados</h3>
@@ -249,7 +255,6 @@ export function MainForm({}: MainFormProps) {
                   const isLastInjection = (data.remainingOD || 0) + (data.remainingOS || 0) === 1;
                   const lastInjectionEye = data.remainingOD === 1 ? 'OD' : data.remainingOS === 1 ? 'OS' : '';
 
-                  // Verificação para "Finalizou" ou "Erro"
                   const nextEyeStatus =
                     data.remainingOD === 0 && data.remainingOS === 0
                       ? 'Finalizou'
@@ -289,6 +294,28 @@ export function MainForm({}: MainFormProps) {
             </button>
             <button type="button" className="btn btn-primary" onClick={handleProcess}>
               Processar
+            </button>
+          </div>
+        </form>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      {/* Modal de Confirmação */}
+      <dialog ref={confirmModalRef} className="modal">
+        <form method="dialog" className="modal-box">
+          <h3 className="font-bold text-xl mb-4 text-center">Confirmação de Processamento</h3>
+          <p className="text-center mb-4">
+            Tem certeza que deseja processar os dados? <strong>Esta ação é irreversível</strong> e todos os pacientes
+            terão as injeções processadas e todos os registros atualizados.
+          </p>
+          <div className="modal-action">
+            <button type="button" className="btn btn-ghost" onClick={handleCloseConfirm}>
+              Voltar
+            </button>
+            <button type="button" className="btn btn-primary" onClick={handleConfirmProcess}>
+              Confirmar
             </button>
           </div>
         </form>

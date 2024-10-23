@@ -37,12 +37,14 @@ export async function processFiles(file: FileList): Promise<Data[]> {
 
     for (const row of rows.slice(startRow)) {
       const [refId, , patientName, , , staffName, , procedureDate, , , treatmentType, status] = row;
-      console.log(status);
       if (status === 'CANCELADO') {
+        // faça um console.log() para cada linha cancelada mostrando um log da linha de forma legível e informativa
+        console.log(`Linha cancelada: ${row.join(', ')}`);
         continue;
       }
       // descarta linhas sem refId ou com refId não numérico
       if (!refId || isNaN(Number(refId))) {
+        console.log(`Linha descartada: ${row.join(', ')}`);
         continue;
       }
 
@@ -53,6 +55,8 @@ export async function processFiles(file: FileList): Promise<Data[]> {
         procedureDate,
         treatmentType,
       });
+
+      console.log(`Linha processada: ${row.join(', ')}`);
     }
   }
 
@@ -60,6 +64,7 @@ export async function processFiles(file: FileList): Promise<Data[]> {
 
   // Ordena pelo nome do paciente (patientName)
   processedData.sort((a, b) => (a.patientName > b.patientName ? 1 : -1));
+  console.log('Dados processados:', processedData);
 
   return processedData;
 }
