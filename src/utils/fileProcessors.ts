@@ -37,7 +37,7 @@ export async function processFiles(file: FileList): Promise<Data[]> {
 
     for (const row of rows.slice(startRow)) {
       const [refId, , patientName, , , staffName, , procedureDate, , , treatmentType, status] = row;
-      if (status === 'CANCELADO') {
+      if (status === 'CANCELADA') {
         // faça um console.log() para cada linha cancelada mostrando um log da linha de forma legível e informativa
         console.log(`Linha cancelada: ${row.join(', ')}`);
         continue;
