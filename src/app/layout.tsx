@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     other: {
       rel: 'mask-icon',
       url: '/safari-pinned-tab.svg',
-      color: '#2570b5',
+      color: '#4d4d4f',
     },
   },
   manifest: '/site.webmanifest',
@@ -101,9 +101,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#2570b5',
-  // Also supported by less commonly used
-  // interactiveWidget: 'resizes-visual',
+  themeColor: '#4d4d4f',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
