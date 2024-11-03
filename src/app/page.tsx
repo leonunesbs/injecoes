@@ -23,16 +23,7 @@ export default function Page() {
           <div className="mb-4 items-center flex flex-col space-y-4 text-center">
             <div className="avatar">
               <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow">
-                <Image
-                  alt="AntiVEGF Logo"
-                  src={'/logo.jpg'}
-                  width={100}
-                  height={100}
-                  priority
-                  blurDataURL="https://antivegf.vercel.app/logo.jpg"
-                  placeholder="blur"
-                  quality={80}
-                />
+                <Image alt="AntiVEGF Logo" src={'/logo.jpg'} width={100} height={100} priority quality={80} />
               </div>
             </div>
             <h1 className="font-black font-mono text-2xl">Relatório de Injeções</h1>
