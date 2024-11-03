@@ -26,7 +26,7 @@ export default function Page() {
                 <Image alt="AntiVEGF Logo" src={'/logo.jpg'} width={100} height={100} priority quality={80} />
               </div>
             </div>
-            <h1 className="font-black font-mono text-2xl">Relatório de Injeções</h1>
+            <h1 className="font-black font-mono text-2xl">Relatórios AntiVEGF</h1>
           </div>
           <div className="card dark:bg-base-200 w-full max-w-md shadow">
             <div className="card-body">
