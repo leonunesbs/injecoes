@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { createOrUpdatePatient } from '@/utils/getInjections';
 import { createPatientPdfBlob, fillPatientPdfTemplateWithData } from '../utils/patientPdfGenerator';
 
 // Opções para Indicações, Medicações e Classificação Swalis
@@ -128,6 +129,8 @@ export function PatientForm() {
         indication,
         medication,
         swalisClassification,
+        remainingOD: data.remainingOD ?? 0,
+        remainingOS: data.remainingOS ?? 0,
       };
 
       // Remove campos desnecessários
@@ -144,6 +147,7 @@ export function PatientForm() {
       window.open(blobUrl, '_blank');
 
       // Aqui você pode salvar os dados do paciente em seu banco de dados, se necessário
+      await createOrUpdatePatient(patientData);
 
       reset();
       showToast('Paciente salvo com sucesso!', 'success');
