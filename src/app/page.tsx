@@ -12,7 +12,6 @@ export type Data = {
   remainingOD?: number;
   remainingOS?: number;
   procedureDate: string;
-  // outros campos...
 };
 
 export default function Page() {
