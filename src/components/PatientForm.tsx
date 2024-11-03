@@ -136,7 +136,7 @@ export function PatientForm() {
       delete patientData.swalisOther;
 
       // Gerar o PDF com os dados do paciente
-      const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
+      const modelPDFBytes = await fetch('/modeloAA.pdf').then((res) => res.arrayBuffer());
       const pdfBytes = await fillPatientPdfTemplateWithData(patientData, modelPDFBytes);
       const blobUrl = createPatientPdfBlob(pdfBytes);
 
