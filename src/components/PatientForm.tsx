@@ -117,6 +117,8 @@ export function PatientForm() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
+    // Abrir o PDF em uma nova aba imediatamente
+    const newWindow = window.open('', '_blank');
     try {
       // Lida com 'Outros' para indicação, medicação e classificação Swalis
       const indication = data.indication === 'Outros' ? data.indicationOther || '' : data.indication;
@@ -143,8 +145,13 @@ export function PatientForm() {
       const pdfBytes = await fillPatientPdfTemplateWithData(patientData, modelPDFBytes);
       const blobUrl = createPatientPdfBlob(pdfBytes);
 
-      // Abrir o PDF em uma nova aba
-      window.open(blobUrl, '_blank');
+      // Atualizar o conteúdo da nova janela com o PDF
+      if (newWindow) {
+        newWindow.location.href = blobUrl;
+      } else {
+        // Se newWindow é null, significa que o popup foi bloqueado
+        showToast('Por favor, permita pop-ups para visualizar o PDF.', 'error');
+      }
 
       // Aqui você pode salvar os dados do paciente em seu banco de dados, se necessário
       await createOrUpdatePatient(patientData);
@@ -156,6 +163,10 @@ export function PatientForm() {
     } catch (error) {
       console.error('Failed to submit:', error);
       showToast('Falha ao salvar o paciente.', 'error');
+      // Fechar a janela se houver um erro
+      if (newWindow) {
+        newWindow.close();
+      }
     } finally {
       setLoading(false);
     }
