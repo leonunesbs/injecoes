@@ -74,7 +74,14 @@ export async function fillPatientPdfTemplateWithData(
   yPosition -= 4.6 * verticalSpacer;
 
   page.drawText(`Swalis: ${data.swalisClassification}`, { x: 140, y: yPosition }); // Classificação Swalis
-  page.drawText(`Começar por: ${data.startEye}`, { x: 195, y: yPosition }); // Olho de início
+
+  // Verifica se há indicação para o olho de início antes de desenhar
+  const hasIndicationOD = (data.remainingOD ?? 0) > 0;
+  const hasIndicationOS = (data.remainingOS ?? 0) > 0;
+
+  if ((data.startEye === 'OD' && hasIndicationOD) || (data.startEye === 'OS' && hasIndicationOS)) {
+    page.drawText(`Começar por: ${data.startEye}`, { x: 195, y: yPosition }); // Olho de início
+  }
 
   // Próxima linha
   yPosition -= 0.8 * verticalSpacer;
