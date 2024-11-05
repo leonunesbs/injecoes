@@ -4,7 +4,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -49,8 +49,10 @@ const patientSchema = z
     swalisClassification: z.string().min(1, 'A Classificação Swalis é obrigatória'),
     swalisOther: z.string().optional(),
     observations: z.string().optional(),
-    remainingOD: z.number().min(0, 'Valor não pode ser negativo').default(0).optional(),
-    remainingOS: z.number().min(0, 'Valor não pode ser negativo').default(0).optional(),
+    remainingODOption: z.string().min(1, 'Por favor, selecione uma opção').default('0'),
+    remainingODCustom: z.number().min(0, 'Valor não pode ser negativo').optional(),
+    remainingOSOption: z.string().min(1, 'Por favor, selecione uma opção').default('0'),
+    remainingOSCustom: z.number().min(0, 'Valor não pode ser negativo').optional(),
     startEye: z.enum(['OD', 'OS']),
   })
   .superRefine((data, ctx) => {
@@ -75,6 +77,26 @@ const patientSchema = z
         path: ['swalisOther'],
       });
     }
+    if (
+      data.remainingODOption === 'Outro' &&
+      (data.remainingODCustom === undefined || data.remainingODCustom === null)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Por favor, especifique a quantidade para OD',
+        path: ['remainingODCustom'],
+      });
+    }
+    if (
+      data.remainingOSOption === 'Outro' &&
+      (data.remainingOSCustom === undefined || data.remainingOSCustom === null)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Por favor, especifique a quantidade para OS',
+        path: ['remainingOSCustom'],
+      });
+    }
   });
 
 type FormData = z.infer<typeof patientSchema>;
@@ -83,6 +105,7 @@ export function PatientForm() {
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [modal, setModal] = useState(document.getElementById('patient-form') as HTMLDialogElement | null);
 
   const {
     register,
@@ -96,74 +119,82 @@ export function PatientForm() {
     defaultValues: {
       refId: '',
       name: '',
-      indication: '',
+      indication: 'RD/EMD',
       indicationOther: '',
-      medication: '',
+      medication: 'Eylia',
       medicationOther: '',
-      swalisClassification: '',
+      swalisClassification: 'A2',
       swalisOther: '',
       observations: '',
-      remainingOD: 0,
-      remainingOS: 0,
-      startEye: 'OD', // Padrão é 'OD'
+      remainingODOption: '0',
+      remainingODCustom: undefined,
+      remainingOSOption: '0',
+      remainingOSCustom: undefined,
+      startEye: 'OD',
     },
   });
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToastMessage(message);
     setToastType(type);
-    setTimeout(() => setToastMessage(null), 3000); // Toast desaparece após 3 segundos
+    setTimeout(() => setToastMessage(null), 3000);
   };
+
+  const closeModal = useCallback(() => {
+    if (modal) {
+      modal.close();
+      modal.classList.remove('modal-open');
+    }
+  }, [modal]);
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    // Abrir o PDF em uma nova aba imediatamente
     const newWindow = window.open('', '_blank');
     try {
-      // Lida com 'Outros' para indicação, medicação e classificação Swalis
       const indication = data.indication === 'Outros' ? data.indicationOther || '' : data.indication;
       const medication = data.medication === 'Outro' ? data.medicationOther || '' : data.medication;
       const swalisClassification =
         data.swalisClassification === 'Outros' ? data.swalisOther || '' : data.swalisClassification;
+
+      const remainingOD =
+        data.remainingODOption === 'Outro' ? data.remainingODCustom ?? 0 : parseInt(data.remainingODOption);
+      const remainingOS =
+        data.remainingOSOption === 'Outro' ? data.remainingOSCustom ?? 0 : parseInt(data.remainingOSOption);
 
       const patientData = {
         ...data,
         indication,
         medication,
         swalisClassification,
-        remainingOD: data.remainingOD ?? 0,
-        remainingOS: data.remainingOS ?? 0,
+        remainingOD,
+        remainingOS,
       };
 
       // Remove campos desnecessários
       delete patientData.indicationOther;
       delete patientData.medicationOther;
       delete patientData.swalisOther;
+      delete patientData.remainingODCustom;
+      delete patientData.remainingOSCustom;
 
-      // Gerar o PDF com os dados do paciente
       const modelPDFBytes = await fetch('/modeloAA.pdf').then((res) => res.arrayBuffer());
       const pdfBytes = await fillPatientPdfTemplateWithData(patientData, modelPDFBytes);
       const blobUrl = createPatientPdfBlob(pdfBytes);
 
-      // Atualizar o conteúdo da nova janela com o PDF
       if (newWindow) {
         newWindow.location.href = blobUrl;
       } else {
-        // Se newWindow é null, significa que o popup foi bloqueado
         showToast('Por favor, permita pop-ups para visualizar o PDF.', 'error');
       }
 
-      // Aqui você pode salvar os dados do paciente em seu banco de dados, se necessário
       await createOrUpdatePatient(patientData);
 
       reset();
       showToast('Paciente salvo com sucesso!', 'success');
-      const modal = document.getElementById('patient-form') as HTMLDialogElement;
-      modal.close();
+      closeModal();
     } catch (error) {
       console.error('Failed to submit:', error);
       showToast('Falha ao salvar o paciente.', 'error');
-      // Fechar a janela se houver um erro
       if (newWindow) {
         newWindow.close();
       }
@@ -172,9 +203,14 @@ export function PatientForm() {
     }
   };
 
-  // Observa a classificação Swalis e Indicação selecionada
   const selectedSwalis = watch('swalisClassification');
   const selectedIndication = watch('indication');
+
+  useEffect(() => {
+    if (!modal) {
+      setModal(document.getElementById('patient-form') as HTMLDialogElement);
+    }
+  }, [modal]);
 
   return (
     <div className="flex justify-end p-4">
@@ -189,14 +225,18 @@ export function PatientForm() {
       <button
         className="btn btn-primary btn-outline"
         onClick={() => {
-          const modal = document.getElementById('patient-form') as HTMLDialogElement;
-          modal.showModal();
+          modal?.showModal();
         }}
       >
         Novo Registro
       </button>
 
-      <dialog id="patient-form" className="modal" aria-labelledby="modal-title" aria-describedby="modal-description">
+      <dialog
+        id="patient-form"
+        className="modal modal-open"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
         <div className="modal-box max-w-2xl">
           <h3 id="modal-title" className="font-bold text-xl mb-4">
             Adicionar ou Atualizar Registro
@@ -290,7 +330,6 @@ export function PatientForm() {
                   {errors.indicationOther.message}
                 </span>
               )}
-              {/* Exibe a descrição da indicação selecionada */}
               {selectedIndication && indicationDescriptions[selectedIndication] && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                   {indicationDescriptions[selectedIndication]}
@@ -347,7 +386,6 @@ export function PatientForm() {
             <div>
               <label className="label flex items-start justify-start">
                 <span className="label-text font-semibold mr-2">Classificação Swalis</span>
-                {/* Botão de informação */}
                 <Link
                   href="https://www.saude.ce.gov.br/wp-content/uploads/sites/9/2018/06/nota_tecnica_fluxo_acesso_cirurgias_eletivas_14_10_2020.pdf"
                   target="_blank"
@@ -408,7 +446,6 @@ export function PatientForm() {
                   {errors.swalisOther.message}
                 </span>
               )}
-              {/* Exibe a descrição da categoria selecionada */}
               {selectedSwalis && swalisDescriptions[selectedSwalis] && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{swalisDescriptions[selectedSwalis]}</p>
               )}
@@ -438,40 +475,94 @@ export function PatientForm() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Injeções Restantes OD */}
               <div>
-                <label className="label" htmlFor="remainingOD">
+                <label className="label">
                   <span className="label-text font-semibold">Injeções (OD)</span>
                 </label>
-                <input
-                  id="remainingOD"
-                  type="number"
-                  {...register('remainingOD', { valueAsNumber: true })}
-                  className={`input input-bordered w-full ${errors.remainingOD ? 'input-error' : ''}`}
-                  aria-invalid={!!errors.remainingOD}
-                  aria-describedby={errors.remainingOD ? 'remainingOD-error' : undefined}
+                <Controller
+                  name="remainingODOption"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {['0', '1', '2', '3', 'Outro'].map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => field.onChange(option)}
+                            className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                      {field.value === 'Outro' && (
+                        <input
+                          type="number"
+                          {...register('remainingODCustom', { valueAsNumber: true })}
+                          placeholder="Quantidade"
+                          className={`input input-bordered w-full mt-2 ${
+                            errors.remainingODCustom ? 'input-error' : ''
+                          }`}
+                        />
+                      )}
+                    </>
+                  )}
                 />
-                {errors.remainingOD && (
-                  <span id="remainingOD-error" role="alert" className="text-error text-sm">
-                    {errors.remainingOD.message}
+                {errors.remainingODOption && (
+                  <span id="remainingODOption-error" role="alert" className="text-error text-sm">
+                    {errors.remainingODOption.message}
+                  </span>
+                )}
+                {errors.remainingODCustom && (
+                  <span id="remainingODCustom-error" role="alert" className="text-error text-sm">
+                    {errors.remainingODCustom.message}
                   </span>
                 )}
               </div>
 
               {/* Injeções Restantes OS */}
               <div>
-                <label className="label" htmlFor="remainingOS">
+                <label className="label">
                   <span className="label-text font-semibold">Injeções (OS)</span>
                 </label>
-                <input
-                  id="remainingOS"
-                  type="number"
-                  {...register('remainingOS', { valueAsNumber: true })}
-                  className={`input input-bordered w-full ${errors.remainingOS ? 'input-error' : ''}`}
-                  aria-invalid={!!errors.remainingOS}
-                  aria-describedby={errors.remainingOS ? 'remainingOS-error' : undefined}
+                <Controller
+                  name="remainingOSOption"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {['0', '1', '2', '3', 'Outro'].map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => field.onChange(option)}
+                            className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                      {field.value === 'Outro' && (
+                        <input
+                          type="number"
+                          {...register('remainingOSCustom', { valueAsNumber: true })}
+                          placeholder="Quantidade"
+                          className={`input input-bordered w-full mt-2 ${
+                            errors.remainingOSCustom ? 'input-error' : ''
+                          }`}
+                        />
+                      )}
+                    </>
+                  )}
                 />
-                {errors.remainingOS && (
-                  <span id="remainingOS-error" role="alert" className="text-error text-sm">
-                    {errors.remainingOS.message}
+                {errors.remainingOSOption && (
+                  <span id="remainingOSOption-error" role="alert" className="text-error text-sm">
+                    {errors.remainingOSOption.message}
+                  </span>
+                )}
+                {errors.remainingOSCustom && (
+                  <span id="remainingOSCustom-error" role="alert" className="text-error text-sm">
+                    {errors.remainingOSCustom.message}
                   </span>
                 )}
               </div>
@@ -485,7 +576,7 @@ export function PatientForm() {
                   name="startEye"
                   control={control}
                   render={({ field }) => (
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-2">
                       <button
                         type="button"
                         onClick={() => field.onChange('OD')}
@@ -522,8 +613,7 @@ export function PatientForm() {
                 type="button"
                 className="btn"
                 onClick={() => {
-                  const modal = document.getElementById('patient-form') as HTMLDialogElement;
-                  modal.close();
+                  closeModal();
                 }}
               >
                 Fechar
@@ -532,7 +622,14 @@ export function PatientForm() {
           </form>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>Fechar</button>
+          <button
+            type="button"
+            onClick={() => {
+              closeModal();
+            }}
+          >
+            Fechar
+          </button>
         </form>
       </dialog>
     </div>
