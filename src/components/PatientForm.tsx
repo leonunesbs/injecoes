@@ -191,7 +191,6 @@ export function PatientForm() {
 
       reset();
       showToast('Paciente salvo com sucesso!', 'success');
-      closeModal();
     } catch (error) {
       console.error('Failed to submit:', error);
       showToast('Falha ao salvar o paciente.', 'error');
