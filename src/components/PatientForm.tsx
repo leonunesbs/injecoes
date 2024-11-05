@@ -105,7 +105,7 @@ export function PatientForm() {
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
-  const [modal, setModal] = useState(document.getElementById('patient-form') as HTMLDialogElement | null);
+  const [modal, setModal] = useState<HTMLDialogElement | null>();
 
   const {
     register,
@@ -207,7 +207,7 @@ export function PatientForm() {
   const selectedIndication = watch('indication');
 
   useEffect(() => {
-    if (!modal) {
+    if (!modal && document) {
       setModal(document.getElementById('patient-form') as HTMLDialogElement);
     }
   }, [modal]);
