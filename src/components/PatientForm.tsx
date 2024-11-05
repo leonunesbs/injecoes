@@ -14,7 +14,7 @@ import { createPatientPdfBlob, fillPatientPdfTemplateWithData } from '../utils/p
 // Opções para Indicações, Medicações e Classificação Swalis
 const indicationOptions = ['RD/EMD', 'RD/HV', 'DMRI', 'OV', 'MNVSR', 'Outros'];
 const medicationOptions = ['Lucentis', 'Avastin', 'Eylia', 'Outro'];
-const swalisOptions = ['A1', 'A2', 'B', 'C', 'D'];
+const swalisOptions = ['A1', 'A2', 'B', 'C', 'D', 'Outros'];
 
 // Map com as descrições das categorias Swalis
 const swalisDescriptions: { [key: string]: string } = {
@@ -49,10 +49,10 @@ const patientSchema = z
     swalisClassification: z.string().min(1, 'A Classificação Swalis é obrigatória'),
     swalisOther: z.string().optional(),
     observations: z.string().optional(),
-    remainingODOption: z.string().min(1, 'Por favor, selecione uma opção').default('0'),
-    remainingODCustom: z.number().min(0, 'Valor não pode ser negativo').optional(),
-    remainingOSOption: z.string().min(1, 'Por favor, selecione uma opção').default('0'),
-    remainingOSCustom: z.number().min(0, 'Valor não pode ser negativo').optional(),
+    remainingODOption: z.enum(['0', '1', '2', '3', 'Outro']).default('0'),
+    remainingODCustom: z.number().min(0, 'Valor não pode ser negativo').optional().nullable(),
+    remainingOSOption: z.enum(['0', '1', '2', '3', 'Outro']).default('0'),
+    remainingOSCustom: z.number().min(0, 'Valor não pode ser negativo').optional().nullable(),
     startEye: z.enum(['OD', 'OS']),
   })
   .superRefine((data, ctx) => {
@@ -63,6 +63,7 @@ const patientSchema = z
         path: ['indicationOther'],
       });
     }
+
     if (data.medication === 'Outro' && !data.medicationOther) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -70,6 +71,7 @@ const patientSchema = z
         path: ['medicationOther'],
       });
     }
+
     if (data.swalisClassification === 'Outros' && !data.swalisOther) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -77,20 +79,16 @@ const patientSchema = z
         path: ['swalisOther'],
       });
     }
-    if (
-      data.remainingODOption === 'Outro' &&
-      (data.remainingODCustom === undefined || data.remainingODCustom === null)
-    ) {
+
+    if (data.remainingODOption === 'Outro' && data.remainingODCustom === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Por favor, especifique a quantidade para OD',
         path: ['remainingODCustom'],
       });
     }
-    if (
-      data.remainingOSOption === 'Outro' &&
-      (data.remainingOSCustom === undefined || data.remainingOSCustom === null)
-    ) {
+
+    if (data.remainingOSOption === 'Outro' && data.remainingOSCustom === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Por favor, especifique a quantidade para OS',
@@ -105,14 +103,13 @@ export function PatientForm() {
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
-  const [modal, setModal] = useState<HTMLDialogElement | null>();
+  const [modal, setModal] = useState<HTMLDialogElement | null>(null);
 
   const {
     register,
-    handleSubmit,
     reset,
+    handleSubmit,
     control,
-    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(patientSchema),
@@ -157,9 +154,10 @@ export function PatientForm() {
         data.swalisClassification === 'Outros' ? data.swalisOther || '' : data.swalisClassification;
 
       const remainingOD =
-        data.remainingODOption === 'Outro' ? data.remainingODCustom ?? 0 : parseInt(data.remainingODOption);
+        data.remainingODOption === 'Outro' ? data.remainingODCustom ?? 0 : parseInt(data.remainingODOption, 10);
+
       const remainingOS =
-        data.remainingOSOption === 'Outro' ? data.remainingOSCustom ?? 0 : parseInt(data.remainingOSOption);
+        data.remainingOSOption === 'Outro' ? data.remainingOSCustom ?? 0 : parseInt(data.remainingOSOption, 10);
 
       const patientData = {
         ...data,
@@ -170,7 +168,6 @@ export function PatientForm() {
         remainingOS,
       };
 
-      // Remove campos desnecessários
       delete patientData.indicationOther;
       delete patientData.medicationOther;
       delete patientData.swalisOther;
@@ -202,9 +199,6 @@ export function PatientForm() {
     }
   };
 
-  const selectedSwalis = watch('swalisClassification');
-  const selectedIndication = watch('indication');
-
   useEffect(() => {
     if (!modal && document) {
       setModal(document.getElementById('patient-form') as HTMLDialogElement);
@@ -214,7 +208,12 @@ export function PatientForm() {
   return (
     <div className="flex justify-end p-4">
       {toastMessage && (
-        <div className={`toast toast-${toastType} fixed bottom-4 right-4 z-50`}>
+        <div
+          className={`toast toast-${toastType} fixed bottom-4 right-4 z-50`}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <div className={`alert alert-${toastType}`}>
             <span>{toastMessage}</span>
           </div>
@@ -226,6 +225,7 @@ export function PatientForm() {
         onClick={() => {
           modal?.showModal();
         }}
+        aria-haspopup="dialog"
       >
         Novo Registro
       </button>
@@ -235,15 +235,15 @@ export function PatientForm() {
         className="modal modal-open"
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
+        role="dialog"
       >
         <div className="modal-box max-w-2xl">
           <h3 id="modal-title" className="font-bold text-xl mb-4">
             Adicionar ou Atualizar Registro
           </h3>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+          <form className="space-y-6" noValidate onSubmit={handleSubmit(onSubmit)} aria-describedby="form-errors">
             {/* Informações Básicas */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Nome do Paciente */}
               <div>
                 <label className="label" htmlFor="name">
                   <span className="label-text font-semibold">Nome do Paciente</span>
@@ -264,7 +264,6 @@ export function PatientForm() {
                 )}
               </div>
 
-              {/* ID do Paciente */}
               <div>
                 <label className="label" htmlFor="refId">
                   <span className="label-text font-semibold">ID do Paciente</span>
@@ -296,13 +295,15 @@ export function PatientForm() {
                 control={control}
                 render={({ field }) => (
                   <>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2" role="group" aria-labelledby="indication-label">
                       {indicationOptions.map((option) => (
                         <button
                           key={option}
                           type="button"
                           onClick={() => field.onChange(option)}
                           className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                          aria-pressed={field.value === option}
+                          aria-controls={option === 'Outros' ? 'indicationOther' : undefined}
                         >
                           {option}
                         </button>
@@ -311,10 +312,17 @@ export function PatientForm() {
                     {field.value === 'Outros' && (
                       <input
                         type="text"
+                        id="indicationOther"
                         {...register('indicationOther')}
                         placeholder="Especifique a indicação"
                         className={`input input-bordered w-full mt-2 ${errors.indicationOther ? 'input-error' : ''}`}
+                        aria-required={field.value === 'Outros'}
                       />
+                    )}
+                    {field.value !== 'Outros' && indicationDescriptions[field.value] && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                        {indicationDescriptions[field.value]}
+                      </p>
                     )}
                   </>
                 )}
@@ -323,16 +331,6 @@ export function PatientForm() {
                 <span id="indication-error" role="alert" className="text-error text-sm">
                   {errors.indication.message}
                 </span>
-              )}
-              {errors.indicationOther && (
-                <span id="indicationOther-error" role="alert" className="text-error text-sm">
-                  {errors.indicationOther.message}
-                </span>
-              )}
-              {selectedIndication && indicationDescriptions[selectedIndication] && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {indicationDescriptions[selectedIndication]}
-                </p>
               )}
             </div>
 
@@ -346,13 +344,15 @@ export function PatientForm() {
                 control={control}
                 render={({ field }) => (
                   <>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2" role="group" aria-labelledby="medication-label">
                       {medicationOptions.map((option) => (
                         <button
                           key={option}
                           type="button"
                           onClick={() => field.onChange(option)}
                           className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                          aria-pressed={field.value === option}
+                          aria-controls={option === 'Outro' ? 'medicationOther' : undefined}
                         >
                           {option}
                         </button>
@@ -361,9 +361,11 @@ export function PatientForm() {
                     {field.value === 'Outro' && (
                       <input
                         type="text"
+                        id="medicationOther"
                         {...register('medicationOther')}
                         placeholder="Especifique a medicação"
                         className={`input input-bordered w-full mt-2 ${errors.medicationOther ? 'input-error' : ''}`}
+                        aria-required={field.value === 'Outro'}
                       />
                     )}
                   </>
@@ -372,11 +374,6 @@ export function PatientForm() {
               {errors.medication && (
                 <span id="medication-error" role="alert" className="text-error text-sm">
                   {errors.medication.message}
-                </span>
-              )}
-              {errors.medicationOther && (
-                <span id="medicationOther-error" role="alert" className="text-error text-sm">
-                  {errors.medicationOther.message}
                 </span>
               )}
             </div>
@@ -412,13 +409,15 @@ export function PatientForm() {
                 control={control}
                 render={({ field }) => (
                   <>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2" role="group" aria-labelledby="swalis-classification">
                       {swalisOptions.map((option) => (
                         <button
                           key={option}
                           type="button"
                           onClick={() => field.onChange(option)}
                           className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                          aria-pressed={field.value === option}
+                          aria-controls={option === 'Outros' ? 'swalisOther' : undefined}
                         >
                           {option}
                         </button>
@@ -427,10 +426,15 @@ export function PatientForm() {
                     {field.value === 'Outros' && (
                       <input
                         type="text"
+                        id="swalisOther"
                         {...register('swalisOther')}
                         placeholder="Especifique a classificação"
                         className={`input input-bordered w-full mt-2 ${errors.swalisOther ? 'input-error' : ''}`}
+                        aria-required={field.value === 'Outros'}
                       />
+                    )}
+                    {field.value !== 'Outros' && swalisDescriptions[field.value] && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{swalisDescriptions[field.value]}</p>
                     )}
                   </>
                 )}
@@ -439,14 +443,6 @@ export function PatientForm() {
                 <span id="swalisClassification-error" role="alert" className="text-error text-sm">
                   {errors.swalisClassification.message}
                 </span>
-              )}
-              {errors.swalisOther && (
-                <span id="swalisOther-error" role="alert" className="text-error text-sm">
-                  {errors.swalisOther.message}
-                </span>
-              )}
-              {selectedSwalis && swalisDescriptions[selectedSwalis] && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{swalisDescriptions[selectedSwalis]}</p>
               )}
             </div>
 
@@ -482,13 +478,15 @@ export function PatientForm() {
                   control={control}
                   render={({ field }) => (
                     <>
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 mt-2" role="group" aria-labelledby="remaining-od-option">
                         {['0', '1', '2', '3', 'Outro'].map((option) => (
                           <button
                             key={option}
                             type="button"
                             onClick={() => field.onChange(option)}
                             className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                            aria-pressed={field.value === option}
+                            aria-controls={option === 'Outro' ? 'remainingODCustom' : undefined}
                           >
                             {option}
                           </button>
@@ -497,26 +495,18 @@ export function PatientForm() {
                       {field.value === 'Outro' && (
                         <input
                           type="number"
+                          id="remainingODCustom"
                           {...register('remainingODCustom', { valueAsNumber: true })}
                           placeholder="Quantidade"
                           className={`input input-bordered w-full mt-2 ${
                             errors.remainingODCustom ? 'input-error' : ''
                           }`}
+                          aria-required={field.value === 'Outro'}
                         />
                       )}
                     </>
                   )}
                 />
-                {errors.remainingODOption && (
-                  <span id="remainingODOption-error" role="alert" className="text-error text-sm">
-                    {errors.remainingODOption.message}
-                  </span>
-                )}
-                {errors.remainingODCustom && (
-                  <span id="remainingODCustom-error" role="alert" className="text-error text-sm">
-                    {errors.remainingODCustom.message}
-                  </span>
-                )}
               </div>
 
               {/* Injeções Restantes OS */}
@@ -529,13 +519,15 @@ export function PatientForm() {
                   control={control}
                   render={({ field }) => (
                     <>
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 mt-2" role="group" aria-labelledby="remaining-os-option">
                         {['0', '1', '2', '3', 'Outro'].map((option) => (
                           <button
                             key={option}
                             type="button"
                             onClick={() => field.onChange(option)}
                             className={`btn btn-sm ${field.value === option ? 'btn-primary' : 'btn-outline'}`}
+                            aria-pressed={field.value === option}
+                            aria-controls={option === 'Outro' ? 'remainingOSCustom' : undefined}
                           >
                             {option}
                           </button>
@@ -544,26 +536,18 @@ export function PatientForm() {
                       {field.value === 'Outro' && (
                         <input
                           type="number"
+                          id="remainingOSCustom"
                           {...register('remainingOSCustom', { valueAsNumber: true })}
                           placeholder="Quantidade"
                           className={`input input-bordered w-full mt-2 ${
                             errors.remainingOSCustom ? 'input-error' : ''
                           }`}
+                          aria-required={field.value === 'Outro'}
                         />
                       )}
                     </>
                   )}
                 />
-                {errors.remainingOSOption && (
-                  <span id="remainingOSOption-error" role="alert" className="text-error text-sm">
-                    {errors.remainingOSOption.message}
-                  </span>
-                )}
-                {errors.remainingOSCustom && (
-                  <span id="remainingOSCustom-error" role="alert" className="text-error text-sm">
-                    {errors.remainingOSCustom.message}
-                  </span>
-                )}
               </div>
 
               {/* Olho de Início */}
@@ -575,11 +559,12 @@ export function PatientForm() {
                   name="startEye"
                   control={control}
                   render={({ field }) => (
-                    <div className="flex items-center mt-2">
+                    <div className="flex items-center mt-2" role="group" aria-labelledby="start-eye">
                       <button
                         type="button"
                         onClick={() => field.onChange('OD')}
                         className={`btn btn-sm mr-2 ${field.value === 'OD' ? 'btn-primary' : 'btn-outline'}`}
+                        aria-pressed={field.value === 'OD'}
                       >
                         OD
                       </button>
@@ -587,6 +572,7 @@ export function PatientForm() {
                         type="button"
                         onClick={() => field.onChange('OS')}
                         className={`btn btn-sm ${field.value === 'OS' ? 'btn-primary' : 'btn-outline'}`}
+                        aria-pressed={field.value === 'OS'}
                       >
                         OS
                       </button>
@@ -608,12 +594,14 @@ export function PatientForm() {
               <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? <span className="loading loading-spinner"></span> : 'Salvar'}
               </button>
+
               <button
                 type="button"
                 className="btn"
                 onClick={() => {
                   closeModal();
                 }}
+                aria-label="Fechar Modal"
               >
                 Fechar
               </button>
@@ -626,6 +614,7 @@ export function PatientForm() {
             onClick={() => {
               closeModal();
             }}
+            aria-label="Fechar Modal"
           >
             Fechar
           </button>
