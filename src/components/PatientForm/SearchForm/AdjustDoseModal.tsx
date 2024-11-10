@@ -23,7 +23,9 @@ export const AdjustDoseModal = forwardRef<HTMLDialogElement, AdjustDoseModalProp
         setIsAdjustingDose(true);
         try {
           // Atualizar o status da injeção e o tipo
-          await updateInjectionStatus(editingInjection.id, editingInjection.status, editingInjection.type);
+          if (editingInjection.status !== 'pending') {
+            await updateInjectionStatus(editingInjection.id, editingInjection.status, editingInjection.type);
+          }
 
           // Atualizar o estado local das injeções
           setInjections((prevInjections) =>
