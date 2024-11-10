@@ -32,6 +32,7 @@ model Injection {
   OS        Int      @default(0)
   done      Boolean  @default(false)
   notDone   Boolean  @default(false)
+  type      String   @default("")
 
   patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 }

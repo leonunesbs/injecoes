@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { TbFileTypeCsv, TbFileTypeXls } from 'react-icons/tb';
 
 import { processFiles } from '@/utils/fileProcessors';
-import { getPatientsData, updatePatientInjections } from '@/utils/manageInjections';
+import { determineNextEye, getPatientsData, updatePatientInjections } from '@/utils/manageInjections';
 import { createPdfFromData, createPdfUrl } from '@/utils/pdfGenerator';
 import { sortPdfPages } from '@/utils/pdfSorter';
 import { ProcessButton } from './ProcessButton';
@@ -28,7 +28,7 @@ export type MainFormData = {
   remainingOD?: number;
   remainingOS?: number;
   isRegistered: boolean;
-  nextEye: string; // 'OD' or 'OS'
+  nextEye: string; // 'OD' or 'OS' or ''
 };
 
 export function MainForm({}: MainFormProps) {
@@ -44,25 +44,6 @@ export function MainForm({}: MainFormProps) {
   const openButtonRef = useRef<HTMLButtonElement>(null);
 
   /**
-   * Função auxiliar para determinar o próximo olho a ser tratado
-   * @param patient - O paciente e suas informações de injeções
-   * @returns Próximo olho a ser tratado: 'OD', 'OS' ou ''
-   */
-  const determineNextEye = (patient: any): string => {
-    if (!patient) return '';
-
-    const { injections, remainingOD, remainingOS, startOD } = patient;
-    const lastInjection = injections[0];
-
-    if (lastInjection) {
-      if (lastInjection.OD > 0 && remainingOS) return 'OS';
-      if (lastInjection.OS > 0 && remainingOD) return 'OD';
-    }
-
-    return startOD && remainingOD ? 'OD' : 'OS';
-  };
-
-  /**
    * Função para processar os dados de pacientes carregados
    * @param uploadedData - Dados carregados pelo usuário
    * @returns Array de dados processados dos pacientes
@@ -72,12 +53,15 @@ export function MainForm({}: MainFormProps) {
 
     return uploadedData.map((item) => {
       const patient = patients.find((p) => p.refId === item.refId);
+
+      const nextEye = patient ? determineNextEye(patient) : '';
+
       return {
         ...item,
         remainingOD: patient?.remainingOD,
         remainingOS: patient?.remainingOS,
         isRegistered: !!patient,
-        nextEye: determineNextEye(patient),
+        nextEye,
       };
     });
   };
@@ -267,7 +251,7 @@ export function MainForm({}: MainFormProps) {
                         ? 'Erro'
                         : isLastInjection
                           ? `Última (${lastInjectionEye})`
-                          : data.nextEye;
+                          : data.nextEye || 'N/A';
 
                   return (
                     <tr key={index}>
@@ -277,7 +261,7 @@ export function MainForm({}: MainFormProps) {
                       <td>{data.remainingOS ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
                       <td>
                         <span className={nextEyeStatus === 'Erro' ? 'text-red-600 font-bold' : ''}>
-                          {nextEyeStatus || <span className="text-gray-500 italic">N/A</span>}
+                          {nextEyeStatus}
                         </span>
                       </td>
                     </tr>

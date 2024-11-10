@@ -4,11 +4,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import {
+  adjustPatientDose,
   fetchPatientData,
   fetchPatientInjections,
   updateInjectionStatus,
@@ -20,6 +21,7 @@ interface Injection {
   date: string;
   eye: 'OD' | 'OS';
   status: 'done' | 'notDone' | 'pending';
+  type: string;
 }
 
 interface PatientData {
@@ -95,6 +97,14 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
   const [isEditingPatientData, setIsEditingPatientData] = useState(false);
   const [editingInjectionId, setEditingInjectionId] = useState<string | null>(null);
   const [editingInjectionStatus, setEditingInjectionStatus] = useState<'done' | 'notDone' | 'pending'>('pending');
+  const [selectedInjection, setSelectedInjection] = useState<Injection | null>(null);
+  const [editingInjectionType, setEditingInjectionType] = useState<string>('');
+
+  const adjustDoseModalRef = useRef<HTMLDialogElement>(null);
+
+  // Estados de carregamento
+  const [isSavingPatientData, setIsSavingPatientData] = useState(false);
+  const [isAdjustingDose, setIsAdjustingDose] = useState(false);
 
   // Mapeamento de status para labels em português
   const statusLabels: { [key: string]: string } = {
@@ -136,6 +146,7 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
       setPatientInjections([]);
       setIsEditingPatientData(false);
       setEditingInjectionId(null);
+      setSelectedInjection(null);
     }
   }, [modal, resetSearchForm, resetEditPatientForm]);
 
@@ -194,6 +205,7 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
 
   const onSubmitEditPatient = async (data: EditPatientFormData) => {
     if (patientData) {
+      setIsSavingPatientData(true);
       try {
         const remainingOD =
           data.remainingODOption === 'Outro' ? data.remainingODCustom : parseInt(data.remainingODOption);
@@ -220,6 +232,8 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
       } catch (error) {
         console.error('Failed to update patient data:', error);
         showToast('Falha ao atualizar os dados do paciente.', 'error');
+      } finally {
+        setIsSavingPatientData(false);
       }
     }
   };
@@ -232,33 +246,83 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
   const handleEditInjection = (injection: Injection) => {
     setEditingInjectionId(injection.id);
     setEditingInjectionStatus(injection.status);
+    setSelectedInjection(injection);
+    setEditingInjectionType(injection.type);
   };
 
-  const handleSaveInjection = async () => {
-    if (editingInjectionId && editingInjectionStatus) {
+  const handleSaveInjection = () => {
+    if (editingInjectionId && editingInjectionStatus && selectedInjection && patientData) {
+      if (editingInjectionStatus === selectedInjection.status && editingInjectionType === selectedInjection.type) {
+        showToast('Nenhuma alteração foi feita.', 'error');
+        return;
+      }
+
+      if (editingInjectionStatus === 'pending') {
+        showToast('Status "Pendente" não pode ser salvo.', 'error');
+        return;
+      }
+
+      // Abrir o diálogo para ajustar as doses restantes
+      adjustDoseModalRef.current?.showModal();
+    }
+  };
+
+  const handleConfirmAdjustDose = async (adjustDose: boolean) => {
+    if (editingInjectionId && editingInjectionStatus && selectedInjection && patientData) {
+      setIsAdjustingDose(true);
       try {
+        // Atualizar o status da injeção e o tipo
         if (editingInjectionStatus !== 'pending') {
-          await updateInjectionStatus(editingInjectionId, editingInjectionStatus);
-        } else {
-          showToast('Status "Pendente" não pode ser salvo.', 'error');
-          return;
+          await updateInjectionStatus(editingInjectionId, editingInjectionStatus, editingInjectionType);
         }
+
+        // Atualizar o estado local das injeções
         setPatientInjections((prevInjections) =>
           prevInjections.map((inj) =>
-            inj.id === editingInjectionId ? { ...inj, status: editingInjectionStatus } : inj
+            inj.id === editingInjectionId ? { ...inj, status: editingInjectionStatus, type: editingInjectionType } : inj
           )
         );
-        showToast('Status da injeção atualizado com sucesso!', 'success');
+
+        // Ajustar a dose se o usuário confirmou
+        if (adjustDose) {
+          if (editingInjectionStatus === 'done') {
+            await adjustPatientDose(patientData.id, selectedInjection.eye, -1);
+          } else if (editingInjectionStatus === 'notDone') {
+            await adjustPatientDose(patientData.id, selectedInjection.eye, 1);
+          }
+
+          // Atualizar os dados do paciente localmente
+          const updatedPatientData = await fetchPatientData(patientData.refId);
+          setPatientData(updatedPatientData);
+
+          showToast('Status da injeção e doses restantes atualizados com sucesso!', 'success');
+        } else {
+          showToast('Status da injeção atualizado com sucesso!', 'success');
+        }
+
+        // Fechar o diálogo e resetar estados
         setEditingInjectionId(null);
+        setSelectedInjection(null);
+        setEditingInjectionStatus('pending');
+        adjustDoseModalRef.current?.close();
       } catch (error) {
-        console.error('Failed to update injection status:', error);
-        showToast('Falha ao atualizar o status da injeção.', 'error');
+        console.error('Failed to update injection status or adjust patient dose:', error);
+        showToast('Falha ao atualizar o status da injeção ou ajustar a dose do paciente.', 'error');
+      } finally {
+        setIsAdjustingDose(false);
       }
     }
   };
 
+  const handleCancelAdjustDose = () => {
+    // O usuário optou por não ajustar as doses
+    handleConfirmAdjustDose(false);
+  };
+
   const handleCancelEditInjection = () => {
     setEditingInjectionId(null);
+    setSelectedInjection(null);
+    setEditingInjectionStatus('pending');
   };
 
   return (
@@ -472,8 +536,8 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
 
                 {/* Botões de ação */}
                 <div className="flex items-end space-x-2 mt-4 md:col-span-3">
-                  <button className="btn btn-primary" type="submit" aria-label="Salvar">
-                    Salvar
+                  <button className="btn btn-primary" type="submit" aria-label="Salvar" disabled={isSavingPatientData}>
+                    {isSavingPatientData ? <span className="loading loading-spinner"></span> : 'Salvar'}
                   </button>
                   <button
                     className="btn btn-ghost"
@@ -518,6 +582,7 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
                     <th>Data</th>
                     <th>Olho</th>
                     <th>Status</th>
+                    <th>Tipo</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
@@ -539,6 +604,7 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
                           {statusLabels[injection.status]}
                         </span>
                       </td>
+                      <td>{injection.type}</td>
                       <td>
                         {editingInjectionId === injection.id ? (
                           <div className="flex items-center space-x-2">
@@ -551,8 +617,17 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
                             >
                               <option value="done">Realizado</option>
                               <option value="notDone">Não Realizado</option>
-                              <option value="pending">Pendente</option>
+                              <option value="pending" disabled>
+                                Pendente
+                              </option>
                             </select>
+                            <input
+                              type="text"
+                              className="input input-bordered input-sm"
+                              placeholder="Tipo de Injeção"
+                              value={editingInjectionType}
+                              onChange={(e) => setEditingInjectionType(e.target.value)}
+                            />
                             <button
                               className="btn btn-primary btn-sm"
                               onClick={handleSaveInjection}
@@ -571,7 +646,9 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
                         ) : (
                           <button
                             className="btn btn-primary btn-sm btn-outline"
-                            onClick={() => handleEditInjection(injection)}
+                            onClick={() => {
+                              handleEditInjection(injection);
+                            }}
                             aria-label="Editar"
                           >
                             Editar
@@ -603,6 +680,44 @@ export function SearchPatientModal({ modal, showToast }: SearchPatientModalProps
           Fechar
         </button>
       </form>
+
+      {/* Modal de Ajuste de Dose */}
+      <dialog ref={adjustDoseModalRef} className="modal">
+        <form method="dialog" className="modal-box">
+          <h3 className="font-bold text-xl mb-4 text-center">Ajustar Doses Restantes</h3>
+          <p className="mb-4">
+            Você alterou o status para{' '}
+            <strong>{editingInjectionStatus === 'done' ? 'Realizado' : 'Não Realizado'}</strong>. Deseja{' '}
+            {editingInjectionStatus === 'done' ? 'debitar' : 'creditar'} uma dose restante no olho{' '}
+            <strong>{selectedInjection?.eye}</strong>?
+          </p>
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => handleConfirmAdjustDose(false)}
+              disabled={isAdjustingDose}
+              aria-label="Não ajustar doses"
+            >
+              {isAdjustingDose ? <span className="loading loading-spinner"></span> : 'Não'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => handleConfirmAdjustDose(true)}
+              disabled={isAdjustingDose}
+              aria-label="Sim, ajustar doses"
+            >
+              {isAdjustingDose ? <span className="loading loading-spinner"></span> : 'Sim'}
+            </button>
+          </div>
+        </form>
+        <form method="dialog" className="modal-backdrop">
+          <button type="button" onClick={handleCancelAdjustDose} aria-label="Fechar Modal de Ajuste de Dose">
+            Fechar
+          </button>
+        </form>
+      </dialog>
     </dialog>
   );
 }
