@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 
 import { CreateOrUpdatePatientModal } from './CreateOrUpdatePatientModal';
-import { SearchPatientModal } from './SearchPatientModal';
+import { SearchPatientModal } from './SearchForm/SearchPatientModal';
 
 export function PatientForm() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
