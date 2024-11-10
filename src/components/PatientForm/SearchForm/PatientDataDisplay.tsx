@@ -28,6 +28,9 @@ export function PatientDataDisplay({ patientData, setIsEditing }: PatientDataDis
           <p>
             <strong>Nome:</strong> {patientData.name}
           </p>
+          <p>
+            <strong>Indicação:</strong> {patientData.indication}
+          </p>
         </div>
         <div>
           <p>

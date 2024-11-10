@@ -17,6 +17,7 @@ interface PatientEditFormProps {
 const editPatientSchema = z
   .object({
     name: z.string().min(1, 'O nome não pode ser vazio.'),
+    indication: z.string().min(1, 'A indicação não pode ser vazio.'),
     remainingODOption: z.string(),
     remainingODCustom: z
       .number({ invalid_type_error: 'Por favor, insira um número.' })
@@ -65,6 +66,7 @@ export function PatientEditForm({ patientData, setPatientData, setIsEditing, sho
     resolver: zodResolver(editPatientSchema),
     defaultValues: {
       name: patientData.name,
+      indication: patientData.indication,
       remainingODOption: [0, 1, 2, 3].includes(patientData.remainingOD) ? patientData.remainingOD.toString() : 'Outro',
       remainingODCustom: [0, 1, 2, 3].includes(patientData.remainingOD) ? undefined : patientData.remainingOD,
       remainingOSOption: [0, 1, 2, 3].includes(patientData.remainingOS) ? patientData.remainingOS.toString() : 'Outro',
@@ -82,6 +84,7 @@ export function PatientEditForm({ patientData, setPatientData, setIsEditing, sho
       const updatedData: PatientData = {
         ...patientData,
         name: data.name,
+        indication: data.indication,
         remainingOD: remainingOD!,
         remainingOS: remainingOS!,
       };
@@ -89,6 +92,7 @@ export function PatientEditForm({ patientData, setPatientData, setIsEditing, sho
       await updatePatientData({
         id: patientData.id,
         name: updatedData.name,
+        indication: updatedData.indication,
         remainingOD: updatedData.remainingOD,
         remainingOS: updatedData.remainingOS,
       });
@@ -143,6 +147,25 @@ export function PatientEditForm({ patientData, setPatientData, setIsEditing, sho
         {errors.name && (
           <span id="editName-error" role="alert" className="text-error text-sm">
             {errors.name.message}
+          </span>
+        )}
+      </div>
+
+      {/* Campo de Indicação */}
+      <div className="form-control md:col-span-3">
+        <label className="label" htmlFor="editIndication">
+          <span className="label-text">Indicação</span>
+        </label>
+        <textarea
+          id="editIndication"
+          {...register('indication')}
+          className={`textarea textarea-bordered w-full ${errors.indication ? 'textarea-error' : ''}`}
+          aria-invalid={!!errors.indication}
+          aria-describedby={errors.indication ? 'editIndication-error' : undefined}
+        />
+        {errors.indication && (
+          <span id="editIndication-error" role="alert" className="text-error text-sm">
+            {errors.indication.message}
           </span>
         )}
       </div>

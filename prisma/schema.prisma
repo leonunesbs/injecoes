@@ -17,6 +17,7 @@ model Patient {
   id          String  @id @default(cuid())
   refId       String  @unique
   name        String  @default("")
+  indication  String  @default("")
   remainingOD Int     @default(0)
   remainingOS Int     @default(0)
   startOD     Boolean @default(true)

@@ -73,7 +73,7 @@ export function CreateOrUpdatePatientModal({ modal, showToast }: CreateOrUpdateP
       const patientData = {
         refId: data.refId,
         name: data.name,
-        indication,
+        indication, // Incluído aqui
         medication,
         swalisClassification,
         remainingOD,
@@ -96,6 +96,7 @@ export function CreateOrUpdatePatientModal({ modal, showToast }: CreateOrUpdateP
       await createOrUpdatePatient({
         refId: patientData.refId,
         name: patientData.name,
+        indication: patientData.indication,
         remainingOD: patientData.remainingOD,
         remainingOS: patientData.remainingOS,
         startEye: patientData.startEye,

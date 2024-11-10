@@ -12,6 +12,7 @@ export interface PatientData {
   id: string;
   refId: string;
   name: string;
+  indication: string;
   remainingOD: number;
   remainingOS: number;
 }

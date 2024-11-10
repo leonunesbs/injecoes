@@ -31,7 +31,7 @@ export const patientSchema = z
       .min(1, 'O ID do Paciente não pode ser vazio')
       .regex(/^\d+$/, 'O ID do Paciente deve ser um número natural')
       .transform((val) => val.replace(/^0+/, '')), // Remove zeros à esquerda
-    name: z.string().min(1, 'O nome do paciente é obrigatório'), // Incluído 'name'
+    name: z.string().min(1, 'O nome do paciente é obrigatório').toUpperCase(),
     indication: z.string().min(1, 'A indicação é obrigatória'),
     indicationOther: z.string().optional(),
     medication: z.string().min(1, 'A medicação indicada é obrigatória'),

@@ -10,6 +10,7 @@ export interface PatientData {
   id: string; // Patient.id
   refId: string; // Patient.refId
   name: string;
+  indication: string;
   remainingOD: number;
   remainingOS: number;
   startOD: boolean;
@@ -43,6 +44,7 @@ export type CreateOrUpdatePatientInput = {
   name: string;
   remainingOD: number;
   remainingOS: number;
+  indication: string;
   startEye: 'OD' | 'OS';
 };
 
@@ -69,6 +71,7 @@ export async function getPatientsData(refIds: string[]): Promise<PatientData[]> 
     remainingOD: patient.remainingOD,
     remainingOS: patient.remainingOS,
     startOD: patient.startOD,
+    indication: patient.indication,
     injections: patient.injections.map((injection) => ({
       id: injection.id,
       date: injection.date.toISOString(),
@@ -110,7 +113,7 @@ export async function determineNextEye(patient: PatientData): Promise<'OD' | 'OS
 
 // Função para criar ou atualizar um paciente e marcar injeções anteriores como 'notDone'
 export async function createOrUpdatePatient(input: CreateOrUpdatePatientInput): Promise<void> {
-  const { refId, name, remainingOD, remainingOS, startEye } = input;
+  const { refId, name, remainingOD, remainingOS, startEye, indication } = input;
 
   await prisma.$transaction(async (prisma) => {
     // Upsert do paciente
@@ -120,6 +123,7 @@ export async function createOrUpdatePatient(input: CreateOrUpdatePatientInput): 
         name,
         remainingOD,
         remainingOS,
+        indication,
         startOD: startEye === 'OD',
       },
       create: {
@@ -127,6 +131,7 @@ export async function createOrUpdatePatient(input: CreateOrUpdatePatientInput): 
         name,
         remainingOD,
         remainingOS,
+        indication,
         startOD: startEye === 'OD',
       },
     });
@@ -166,6 +171,7 @@ export async function fetchPatientData(refId: string): Promise<PatientData> {
     name: patient.name,
     remainingOD: patient.remainingOD,
     remainingOS: patient.remainingOS,
+    indication: patient.indication,
     startOD: patient.startOD,
     injections: patient.injections.map((injection) => ({
       id: injection.id,
@@ -288,15 +294,17 @@ export async function updatePatientInjections(refId: string, nextEye: 'OD' | 'OS
 export async function updatePatientData(input: {
   id: string;
   name: string;
+  indication: string;
   remainingOD: number;
   remainingOS: number;
 }): Promise<void> {
-  const { id, name, remainingOD, remainingOS } = input;
+  const { id, name, remainingOD, remainingOS, indication } = input;
 
   await prisma.patient.update({
     where: { id },
     data: {
       name,
+      indication,
       remainingOD,
       remainingOS,
     },
