@@ -120,7 +120,7 @@ export function MainForm({}: MainFormProps) {
       await Promise.all(
         updatedData.map(async (item: UpdatedDataItem) => {
           if (item.isRegistered && item.nextEye) {
-            await updatePatientInjections(item.refId, item.nextEye as 'OD' | 'OS');
+            await updatePatientInjections(item.refId, item.nextEye as 'OD' | 'OS', item.treatmentType);
           }
         })
       );
