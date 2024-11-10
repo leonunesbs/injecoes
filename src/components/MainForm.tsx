@@ -128,8 +128,13 @@ export function MainForm({}: MainFormProps) {
     }));
 
     try {
+      interface UpdatedDataItem extends MainFormData {
+        staffName: string;
+        treatmentType: string;
+      }
+
       await Promise.all(
-        updatedData.map(async (item) => {
+        updatedData.map(async (item: UpdatedDataItem) => {
           if (item.isRegistered && item.nextEye) {
             await updatePatientInjections(item.refId, item.nextEye as 'OD' | 'OS');
           }

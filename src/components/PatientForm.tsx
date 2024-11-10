@@ -14,7 +14,7 @@ import { createPatientPdfBlob, fillPatientPdfTemplateWithData } from '../utils/p
 // Opções para Indicações, Medicações e Classificação Swalis
 const indicationOptions = ['RD/EMD', 'RD/HV', 'DMRI', 'OV', 'MNVSR', 'Outros'];
 const medicationOptions = ['Lucentis', 'Avastin', 'Eylia', 'Outro'];
-const swalisOptions = ['A1', 'A2', 'B', 'C', 'D', 'Outros'];
+const swalisOptions = ['A1', 'A2', 'B', 'C', 'D'];
 
 // Map com as descrições das categorias Swalis
 const swalisDescriptions: { [key: string]: string } = {

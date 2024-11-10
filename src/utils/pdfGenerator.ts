@@ -47,7 +47,7 @@ export async function createPdfFromData(
 ): Promise<PDFDocument> {
   const pdfDoc = await PDFDocument.create();
 
-  // Add a blank page at the beginning
+  // Adiciona uma página em branco no início
   const blankPage = pdfDoc.addPage();
   const { width, height } = blankPage.getSize();
 
@@ -55,27 +55,27 @@ export async function createPdfFromData(
   blankPage.setFont(timesRomanFont);
   blankPage.setFontSize(12);
 
-  // Get today's date
+  // Obter a data de hoje
   const today = new Date().toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   });
 
-  // Write the headers
-  let yPosition = height - 50; // Start from top
-  blankPage.drawText(`Patient Summary - Remaining Doses - Date: ${today}`, { x: 50, y: yPosition });
+  // Escrever os cabeçalhos
+  let yPosition = height - 50; // Começa no topo
+  blankPage.drawText(`Patient Summary - Doses Restantes - Date: ${today}`, { x: 50, y: yPosition });
   yPosition -= 30;
 
-  // Header row
-  blankPage.drawText('Patient ID', { x: 50, y: yPosition });
+  // Cabeçalho da tabela
+  blankPage.drawText('Prontuário', { x: 50, y: yPosition });
   blankPage.drawText('Name', { x: 120, y: yPosition });
-  blankPage.drawText('Next Eye', { x: 405, y: yPosition }); // Adjusted position
-  blankPage.drawText('OD', { x: 505, y: yPosition }); // Adjusted position
-  blankPage.drawText('OS', { x: 530, y: yPosition }); // Adjusted position
+  blankPage.drawText('Hoje', { x: 405, y: yPosition });
+  blankPage.drawText('OD', { x: 505, y: yPosition });
+  blankPage.drawText('OS', { x: 530, y: yPosition });
   yPosition -= 10;
 
-  // Draw a line below the header
+  // Linha abaixo do cabeçalho
   blankPage.drawLine({
     start: { x: 50, y: yPosition },
     end: { x: width - 50, y: yPosition },
@@ -84,15 +84,13 @@ export async function createPdfFromData(
   });
   yPosition -= 20;
 
-  // For each patient, write the data in table format
+  // Preencher a tabela com dados dos pacientes
   processedData.forEach((data, index) => {
     const lineY = yPosition - index * 20;
 
-    // Verificação se a soma das injeções restantes é igual a 1
     const isLastInjection = (data.remainingOD || 0) + (data.remainingOS || 0) === 1;
     const lastInjectionEye = data.remainingOD === 1 ? 'OD' : data.remainingOS === 1 ? 'OS' : '';
 
-    // Verificação para "Finalizou" ou "Erro"
     const nextEyeStatus =
       data.remainingOD === 0 && data.remainingOS === 0
         ? 'Finalizou'
@@ -107,13 +105,10 @@ export async function createPdfFromData(
 
     blankPage.drawText(data.refId.toString(), { x: 50, y: lineY });
     blankPage.drawText(data.patientName, { x: 120, y: lineY });
-
-    // Exibir "Finalizou", "Erro", ou "Última" no campo próximo olho
     blankPage.drawText(nextEyeStatus || '', { x: 405, y: lineY });
     blankPage.drawText(odText, { x: 505, y: lineY });
     blankPage.drawText(osText, { x: 530, y: lineY });
 
-    // Linha separadora
     blankPage.drawLine({
       start: { x: 50, y: lineY - 5 },
       end: { x: width - 50, y: lineY - 5 },
@@ -122,12 +117,19 @@ export async function createPdfFromData(
     });
   });
 
-  // Add total number of patients at the bottom
+  // Total de pacientes no final da página
   const totalPatients = processedData.length;
   yPosition -= totalPatients * 20 + 30;
   blankPage.drawText(`Total Patients: ${totalPatients}`, { x: 50, y: yPosition });
 
-  // Now, process each patient and add their pages
+  // Adicionar o disclaimer ao final da página Summary
+  yPosition -= 40; // Ajuste para garantir que haja espaço para o disclaimer
+  blankPage.drawText(
+    'Este documento foi gerado automaticamente e deve ser revisado para garantir a precisão dos dados.',
+    { x: 50, y: yPosition }
+  );
+
+  // Adiciona cada paciente como uma nova página
   for (const data of processedData) {
     if (!data.patientName) continue;
     const newPdfBytes = await fillPdfTemplateWithData(data, modelPDFBytes);
