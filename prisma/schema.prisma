@@ -29,6 +29,8 @@ model Injection {
   date      DateTime @default(now())
   OD        Int      @default(0)
   OS        Int      @default(0)
+  done      Boolean  @default(false)
+  notDone   Boolean  @default(false)
 
   patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 }

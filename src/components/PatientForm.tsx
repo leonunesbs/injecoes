@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { createOrUpdatePatient } from '@/utils/getInjections';
+import { createOrUpdatePatient } from '@/utils/manageInjections';
 import { createPatientPdfBlob, fillPatientPdfTemplateWithData } from '../utils/patientPdfGenerator';
 
 // Opções para Indicações, Medicações e Classificação Swalis

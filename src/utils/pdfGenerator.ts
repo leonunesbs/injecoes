@@ -64,12 +64,12 @@ export async function createPdfFromData(
 
   // Escrever os cabeçalhos
   let yPosition = height - 50; // Começa no topo
-  blankPage.drawText(`Patient Summary - Doses Restantes - Date: ${today}`, { x: 50, y: yPosition });
+  blankPage.drawText(`Resumo dos Pacientes - Doses Restantes - Date: ${today}`, { x: 50, y: yPosition });
   yPosition -= 30;
 
   // Cabeçalho da tabela
   blankPage.drawText('Prontuário', { x: 50, y: yPosition });
-  blankPage.drawText('Name', { x: 120, y: yPosition });
+  blankPage.drawText('Nome', { x: 120, y: yPosition });
   blankPage.drawText('Hoje', { x: 405, y: yPosition });
   blankPage.drawText('OD', { x: 505, y: yPosition });
   blankPage.drawText('OS', { x: 530, y: yPosition });
@@ -120,7 +120,7 @@ export async function createPdfFromData(
   // Total de pacientes no final da página
   const totalPatients = processedData.length;
   yPosition -= totalPatients * 20 + 30;
-  blankPage.drawText(`Total Patients: ${totalPatients}`, { x: 50, y: yPosition });
+  blankPage.drawText(`Total Pacientes: ${totalPatients}`, { x: 50, y: yPosition });
 
   // Adicionar o disclaimer ao final da página Summary
   yPosition -= 40; // Ajuste para garantir que haja espaço para o disclaimer
