@@ -156,10 +156,10 @@ export function PatientEditForm({ patientData, setPatientData, setIsEditing, sho
         <label className="label" htmlFor="editIndication">
           <span className="label-text">Indicação</span>
         </label>
-        <textarea
+        <input
           id="editIndication"
           {...register('indication')}
-          className={`textarea textarea-bordered w-full ${errors.indication ? 'textarea-error' : ''}`}
+          className={`input input-bordered w-full ${errors.indication ? 'input-error' : ''}`}
           aria-invalid={!!errors.indication}
           aria-describedby={errors.indication ? 'editIndication-error' : undefined}
         />
