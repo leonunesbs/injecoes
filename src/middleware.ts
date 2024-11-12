@@ -8,8 +8,6 @@ export function middleware(request: NextRequest) {
   const cookiePassword = request.cookies.get('auth')?.value;
   const secretPassword = process.env.SECRET_PASSWORD;
 
-  console.log('cookiePassword:', cookiePassword);
-
   // Verifica se o cookie 'auth' existe, corresponde à senha secreta e não está expirado
   if (!cookiePassword || cookiePassword !== secretPassword) {
     // Redireciona para a página de login se o cookie estiver ausente ou inválido
