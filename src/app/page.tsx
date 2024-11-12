@@ -22,13 +22,13 @@ export default function Page() {
         <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto min-h-[90vh] relative">
           <div className="mb-4 items-center flex flex-col space-y-4 text-center">
             <div className="avatar">
-              <div className="rounded-full ring ring-neutral ring-offset-2 ring-offset-base-100 shadow dark:shadow-none">
+              <div className="rounded-full border">
                 <Image alt="AntiVEGF Logo" src={'/logo.jpg'} width={100} height={100} priority quality={80} />
               </div>
             </div>
             <h1 className="font-black font-mono text-2xl">Relatórios AntiVEGF</h1>
           </div>
-          <div className="card dark:bg-base-200 w-full max-w-md shadow">
+          <div className="card dark:bg-base-200 w-full max-w-md border dark:border-none shadow">
             <div className="card-body">
               <div className="flex text-center w-full justify-center">
                 <Link

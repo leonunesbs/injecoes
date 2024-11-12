@@ -109,6 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body className="min-h-screen bg-base-100 text-base-content antialiased flex flex-col">
         {children}
+
         <span className="bg-primary text-primary-content w-full text-center text-xs py-1">
           Coded with ❤️ by{' '}
           <Link href={'https://github.com/leonunesbs'} className="link no-underline  font-bold" target="_blank">

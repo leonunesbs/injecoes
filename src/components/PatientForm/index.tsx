@@ -2,7 +2,9 @@
 
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { AiOutlineLogout } from 'react-icons/ai';
 
 import { CreateOrUpdatePatientModal } from './CreateOrUpdatePatientModal';
 import { SearchPatientModal } from './SearchForm/SearchPatientModal';
@@ -42,27 +44,31 @@ export function PatientForm() {
           </div>
         </div>
       )}
+      <div className="join">
+        <button
+          className="btn btn-primary btn-outline join-item"
+          onClick={() => {
+            modal?.showModal();
+          }}
+          aria-haspopup="dialog"
+        >
+          Novo Registro
+        </button>
 
-      <button
-        className="btn btn-primary btn-outline"
-        onClick={() => {
-          modal?.showModal();
-        }}
-        aria-haspopup="dialog"
-      >
-        Novo Registro
-      </button>
-
-      <button
-        className="btn btn-secondary btn-outline ml-2"
-        onClick={() => {
-          searchModal?.showModal();
-        }}
-        aria-haspopup="dialog"
-      >
-        Buscar Registro
-      </button>
-
+        <button
+          className="btn btn-secondary btn-outline join-item"
+          onClick={() => {
+            searchModal?.showModal();
+          }}
+          aria-haspopup="dialog"
+        >
+          Buscar Registro
+        </button>
+        <Link href="/api/logout" className="btn btn-ghost btn-outline flex items-center gap-2 join-item">
+          <AiOutlineLogout size={18} />
+          Sair
+        </Link>
+      </div>
       {/* Modais */}
       <CreateOrUpdatePatientModal modal={modal} showToast={showToast} />
       <SearchPatientModal modal={searchModal} showToast={showToast} />
