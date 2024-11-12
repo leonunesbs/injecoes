@@ -85,6 +85,13 @@ export function InjectionsTable({
                 </td>
               </tr>
             ))}
+            {injections.length === 0 && (
+              <tr>
+                <td colSpan={5} className="text-center">
+                  Nenhuma injeção encontrada.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
