@@ -13,7 +13,6 @@ export async function POST(request: Request) {
 
     // Define o cookie 'auth' com a senha e expiração de 7 dias
     cookieStore.set('auth', password, {
-      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
