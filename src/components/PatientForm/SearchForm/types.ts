@@ -3,7 +3,7 @@
 export interface Injection {
   id: string;
   date: string;
-  eye: 'OD' | 'OS';
+  eye: 'OD' | 'OS' | '';
   status: 'done' | 'notDone' | 'pending';
   type: string;
 }

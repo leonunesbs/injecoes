@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { TbFileTypeCsv, TbFileTypeXls } from 'react-icons/tb';
 
 import { processFiles } from '@/utils/fileProcessors';
-import { determineNextEye, getPatientsData, updatePatientInjections } from '@/utils/manageInjections';
+import { determineNextEye, getPatientsData, updateMultiplePatientInjections } from '@/utils/manageInjections';
 import { createPdfFromData, createPdfUrl } from '@/utils/pdfGenerator';
 import { sortPdfPages } from '@/utils/pdfSorter';
 import { ProcessButton } from './ProcessButton';
@@ -28,7 +28,7 @@ export type MainFormData = {
   remainingOD?: number;
   remainingOS?: number;
   isRegistered: boolean;
-  nextEye: string; // 'OD' or 'OS' or ''
+  nextEye: 'OD' | 'OS' | '';
 };
 
 export function MainForm({}: MainFormProps) {
@@ -48,22 +48,27 @@ export function MainForm({}: MainFormProps) {
    * @param uploadedData - Dados carregados pelo usuário
    * @returns Array de dados processados dos pacientes
    */
-  const processPatientData = async (uploadedData: any[]): Promise<MainFormData[]> => {
+  const processPatientData = async (uploadedData: MainFormData[]): Promise<MainFormData[]> => {
     const patients = await getPatientsData(uploadedData.map((item) => item.refId));
 
-    return uploadedData.map((item) => {
-      const patient = patients.find((p) => p.refId === item.refId);
+    const processedData = await Promise.all(
+      uploadedData.map(async (item) => {
+        const patient = patients.find((p) => p.refId === item.refId);
 
-      const nextEye = patient ? determineNextEye(patient) : '';
+        // Usar a função determineNextEye com refId
+        const nextEye = patient ? await determineNextEye(item.refId) : '';
 
-      return {
-        ...item,
-        remainingOD: patient?.remainingOD,
-        remainingOS: patient?.remainingOS,
-        isRegistered: !!patient,
-        nextEye,
-      };
-    });
+        return {
+          ...item,
+          remainingOD: patient?.remainingOD,
+          remainingOS: patient?.remainingOS,
+          isRegistered: !!patient,
+          nextEye,
+        };
+      })
+    );
+
+    return processedData;
   };
 
   /**
@@ -74,15 +79,20 @@ export function MainForm({}: MainFormProps) {
     setLoading(true);
     try {
       const data = await processFiles(uploadedData);
-      const updatedData = await processPatientData(data);
 
       if (data.length > 0) {
         setStaffName(data[0].staffName);
         setTreatmentType(data[0].treatmentType);
       }
 
-      setProcessedData(updatedData);
+      // Processar os dados dos pacientes usando determineNextEye
+      const processedPatients = await processPatientData(data as MainFormData[]);
+      setProcessedData(processedPatients);
+
       modalRef.current?.showModal();
+    } catch (error) {
+      console.error('Erro ao processar os arquivos:', error);
+      alert('Ocorreu um erro ao processar os arquivos.');
     } finally {
       setLoading(false);
     }
@@ -112,18 +122,7 @@ export function MainForm({}: MainFormProps) {
     }));
 
     try {
-      interface UpdatedDataItem extends MainFormData {
-        staffName: string;
-        treatmentType: string;
-      }
-
-      await Promise.all(
-        updatedData.map(async (item: UpdatedDataItem) => {
-          if (item.isRegistered && item.nextEye) {
-            await updatePatientInjections(item.refId, item.nextEye as 'OD' | 'OS', item.treatmentType);
-          }
-        })
-      );
+      await updateMultiplePatientInjections(updatedData);
 
       const sortedPdfBytes = await sortAndSavePdf(updatedData);
       const pdfBlobUrl = createPdfUrl(sortedPdfBytes);
@@ -241,7 +240,8 @@ export function MainForm({}: MainFormProps) {
               </thead>
               <tbody>
                 {processedData.map((data, index) => {
-                  const isLastInjection = (data.remainingOD || 0) + (data.remainingOS || 0) === 1;
+                  const totalRemaining = (data.remainingOD || 0) + (data.remainingOS || 0);
+                  const isLastInjection = totalRemaining === 1;
                   const lastInjectionEye = data.remainingOD === 1 ? 'OD' : data.remainingOS === 1 ? 'OS' : '';
 
                   const nextEyeStatus =
@@ -257,8 +257,20 @@ export function MainForm({}: MainFormProps) {
                     <tr key={index}>
                       <td>{data.refId}</td>
                       <td>{data.patientName}</td>
-                      <td>{data.remainingOD ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
-                      <td>{data.remainingOS ?? <span className="text-gray-500 italic">Não cadastrado</span>}</td>
+                      <td>
+                        {data.remainingOD !== undefined ? (
+                          data.remainingOD
+                        ) : (
+                          <span className="text-gray-500 italic">Não cadastrado</span>
+                        )}
+                      </td>
+                      <td>
+                        {data.remainingOS !== undefined ? (
+                          data.remainingOS
+                        ) : (
+                          <span className="text-gray-500 italic">Não cadastrado</span>
+                        )}
+                      </td>
                       <td>
                         <span className={nextEyeStatus === 'Erro' ? 'text-red-600 font-bold' : ''}>
                           {nextEyeStatus}
@@ -287,7 +299,7 @@ export function MainForm({}: MainFormProps) {
           </div>
         </form>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button>Fechar</button>
         </form>
       </dialog>
 
@@ -309,7 +321,7 @@ export function MainForm({}: MainFormProps) {
           </div>
         </form>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button>Fechar</button>
         </form>
       </dialog>
     </>

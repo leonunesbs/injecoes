@@ -2,40 +2,32 @@
 
 'use server';
 
+import { Prisma } from '@prisma/client';
+
 import prisma from '@/lib/prisma';
 
 // --- Tipos ---
 
-export interface PatientData {
-  id: string; // Patient.id
-  refId: string; // Patient.refId
-  name: string;
-  indication: string;
-  remainingOD: number;
-  remainingOS: number;
-  startOD: boolean;
-  injections: InjectionData[]; // Incluindo injeções
-  // Incluir outros campos do paciente conforme necessário
-}
-
 export interface InjectionData {
   id: string;
   date: string;
-  eye: 'OD' | 'OS';
+  eye: 'OD' | 'OS' | ''; // Inclui string vazia
   status: 'done' | 'notDone' | 'pending';
   done: boolean;
   OD: number;
   OS: number;
   type: string;
-  // Incluir outros campos da injeção conforme necessário
 }
 
-export interface Injection {
+export interface PatientData {
   id: string;
-  date: string;
-  eye: 'OD' | 'OS';
-  status: 'done' | 'notDone' | 'pending';
-  type: string; // Novo campo
+  refId: string;
+  name: string;
+  indication: string;
+  remainingOD: number;
+  remainingOS: number;
+  startOD: boolean;
+  injections: InjectionData[];
 }
 
 // Tipo para criar ou atualizar um paciente
@@ -75,7 +67,7 @@ export async function getPatientsData(refIds: string[]): Promise<PatientData[]> 
     injections: patient.injections.map((injection) => ({
       id: injection.id,
       date: injection.date.toISOString(),
-      eye: injection.OD > 0 ? 'OD' : 'OS',
+      eye: injection.OD > 0 ? 'OD' : injection.OS > 0 ? 'OS' : '', // Ajuste para lidar com OD e OS iguais a 0
       status: injection.done ? 'done' : injection.notDone ? 'notDone' : 'pending',
       done: injection.done,
       OD: injection.OD,
@@ -85,20 +77,43 @@ export async function getPatientsData(refIds: string[]): Promise<PatientData[]> 
   }));
 }
 
-// Função auxiliar para determinar o próximo olho a ser tratado
-export async function determineNextEye(patient: PatientData): Promise<'OD' | 'OS' | ''> {
+// Função ajustada determineNextEye para consultar o banco de dados
+export async function determineNextEye(refId: string): Promise<'OD' | 'OS' | ''> {
+  // Buscar os dados do paciente, incluindo injeções
+  const patient = await prisma.patient.findUnique({
+    where: { refId },
+    include: {
+      injections: {
+        where: {
+          done: true,
+        },
+        orderBy: {
+          date: 'desc',
+        },
+      },
+    },
+  });
+
   if (!patient) return '';
 
   const { injections, remainingOD, remainingOS, startOD } = patient;
 
-  // Filtrar apenas as injeções com status 'done'
-  const doneInjections = injections.filter((inj) => inj.done);
+  // O array 'injections' contém apenas as injeções com 'done: true'
+  const lastDoneInjection = injections[0];
 
-  const lastDoneInjection = doneInjections[0];
+  if (remainingOD <= 0 && remainingOS <= 0) {
+    // Sem injeções restantes
+    return '';
+  }
 
   if (lastDoneInjection) {
-    if (lastDoneInjection.eye === 'OD' && remainingOS > 0) return 'OS';
-    if (lastDoneInjection.eye === 'OS' && remainingOD > 0) return 'OD';
+    const lastEye = lastDoneInjection.OD > 0 ? 'OD' : 'OS';
+
+    if (lastEye === 'OD' && remainingOS > 0) return 'OS';
+    if (lastEye === 'OS' && remainingOD > 0) return 'OD';
+    // Se o último olho foi 'OD', mas não há injeções OS restantes
+    if (lastEye === 'OD' && remainingOD > 0) return 'OD';
+    if (lastEye === 'OS' && remainingOS > 0) return 'OS';
   } else {
     // Se não houver injeções realizadas, iniciar pelo olho definido em startOD
     if (startOD) {
@@ -108,6 +123,7 @@ export async function determineNextEye(patient: PatientData): Promise<'OD' | 'OS
     }
   }
 
+  // Se nenhuma das condições acima for atendida
   return '';
 }
 
@@ -136,7 +152,7 @@ export async function createOrUpdatePatient(input: CreateOrUpdatePatientInput): 
       },
     });
 
-    // Marcar injeções pendentes anteriores como 'notDone = true' para este paciente
+    // Marcar injeções pendentes anteriores como 'notDone' para este paciente
     await prisma.injection.updateMany({
       where: {
         patientId: patient.id,
@@ -176,14 +192,13 @@ export async function fetchPatientData(refId: string): Promise<PatientData> {
     injections: patient.injections.map((injection) => ({
       id: injection.id,
       date: injection.date.toISOString(),
-      eye: injection.OD > 0 ? 'OD' : 'OS',
+      eye: injection.OD > 0 ? 'OD' : injection.OS > 0 ? 'OS' : '', // Ajuste para lidar com OD e OS iguais a 0
       status: injection.done ? 'done' : injection.notDone ? 'notDone' : 'pending',
       done: injection.done,
       OD: injection.OD,
       OS: injection.OS,
       type: injection.type,
     })),
-    // Incluir outros campos conforme necessário
   };
 }
 
@@ -192,6 +207,7 @@ export async function fetchPatientInjections(refId: string): Promise<InjectionDa
   // Primeiro, encontrar o paciente pelo refId para obter o id
   const patient = await prisma.patient.findUnique({
     where: { refId },
+    select: { id: true },
   });
 
   if (!patient) {
@@ -209,13 +225,12 @@ export async function fetchPatientInjections(refId: string): Promise<InjectionDa
   return injections.map((injection) => ({
     id: injection.id,
     date: injection.date.toISOString(),
-    eye: injection.OD > 0 ? 'OD' : 'OS',
+    eye: injection.OD > 0 ? 'OD' : injection.OS > 0 ? 'OS' : '', // Ajuste para lidar com OD e OS iguais a 0
     status: injection.done ? 'done' : injection.notDone ? 'notDone' : 'pending',
     done: injection.done,
     OD: injection.OD,
     OS: injection.OS,
     type: injection.type,
-    // Incluir outros campos conforme necessário
   }));
 }
 
@@ -235,59 +250,96 @@ export async function updateInjectionStatus(
   });
 }
 
-// Função para atualizar as injeções do paciente
-export async function updatePatientInjections(refId: string, nextEye: 'OD' | 'OS', type: string): Promise<void> {
-  await prisma.$transaction(async (prisma) => {
-    const patient = await prisma.patient.findUnique({
-      where: { refId },
-    });
+// Função para atualizar injeções de múltiplos pacientes com uma única transação
+export async function updateMultiplePatientInjections(updatedData: any[]): Promise<void> {
+  // Mapear os refIds dos pacientes para busca em lote
+  const refIds = updatedData.map((item) => item.refId);
 
-    if (!patient) {
-      throw new Error('Paciente não encontrado');
-    }
-
-    // Marcar injeções pendentes anteriores como 'notDone = true'
-    await prisma.injection.updateMany({
-      where: {
-        patientId: patient.id,
-        done: false,
-        notDone: false,
-      },
-      data: {
-        notDone: true,
-      },
-    });
-
-    // Atualizar o olho correto (OD ou OS) e reduzir a contagem de doses restantes
-    if (nextEye === 'OD') {
-      await prisma.patient.update({
-        where: { id: patient.id },
-        data: {
-          remainingOD: { decrement: 1 },
+  await prisma.$transaction(
+    async (prisma) => {
+      // Buscar todos os pacientes de uma vez
+      const patients = await prisma.patient.findMany({
+        where: { refId: { in: refIds } },
+        select: {
+          id: true,
+          refId: true,
+          remainingOD: true,
+          remainingOS: true,
         },
       });
-    } else if (nextEye === 'OS') {
-      await prisma.patient.update({
-        where: { id: patient.id },
+
+      // Mapear pacientes por refId para acesso rápido durante o processamento
+      const patientMap = new Map(patients.map((patient) => [patient.refId, patient]));
+
+      // Preparar operações de atualização de injeções pendentes para todos os pacientes de uma só vez
+      const updateInjections = prisma.injection.updateMany({
+        where: {
+          patientId: { in: patients.map((p) => p.id) },
+          done: false,
+          notDone: false,
+        },
         data: {
-          remainingOS: { decrement: 1 },
+          notDone: true,
         },
       });
-    }
 
-    // Criar nova injeção com 'done = true' e incluir o tipo
-    await prisma.injection.create({
-      data: {
-        patientId: patient.id,
-        date: new Date(),
-        OD: nextEye === 'OD' ? 1 : 0,
-        OS: nextEye === 'OS' ? 1 : 0,
-        done: true,
-        notDone: false,
-        type, // Novo campo
-      },
-    });
-  });
+      // Preparar dados para criar novas injeções e atualizar doses
+      const newInjectionsData: Prisma.InjectionCreateManyInput[] = [];
+      const patientUpdates: Prisma.PatientUpdateArgs[] = [];
+
+      for (const item of updatedData) {
+        const patient = patientMap.get(item.refId);
+        // Se o paciente não for encontrado, pula para o próximo item
+        if (!patient) {
+          continue;
+        }
+
+        // Determinar o próximo olho usando a função atualizada determineNextEye
+        const nextEye = await determineNextEye(item.refId);
+
+        // Se não houver próximo olho, pula o processamento deste paciente
+        if (!nextEye) {
+          continue;
+        }
+
+        // Preparar nova injeção para este paciente
+        newInjectionsData.push({
+          patientId: patient.id,
+          date: new Date(),
+          OD: nextEye === 'OD' ? 1 : 0,
+          OS: nextEye === 'OS' ? 1 : 0,
+          done: true,
+          notDone: false,
+          type: item.treatmentType,
+        });
+
+        // Preparar atualização de doses restantes para o olho correto
+        if (nextEye === 'OD') {
+          patientUpdates.push({
+            where: { id: patient.id },
+            data: { remainingOD: { decrement: 1 } },
+          });
+        } else if (nextEye === 'OS') {
+          patientUpdates.push({
+            where: { id: patient.id },
+            data: { remainingOS: { decrement: 1 } },
+          });
+        }
+      }
+
+      // Executar as atualizações e criações em uma transação única
+      await Promise.all([
+        updateInjections,
+        prisma.injection.createMany({ data: newInjectionsData }),
+        ...patientUpdates.map((update) => prisma.patient.update(update)),
+      ]);
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+      maxWait: 5000, // default: 2000
+      timeout: 15000, // default: 5000
+    }
+  );
 }
 
 // Função para atualizar os dados do paciente
