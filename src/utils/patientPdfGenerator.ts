@@ -11,7 +11,7 @@ interface PatientData {
   observations?: string;
   remainingOD?: number;
   remainingOS?: number;
-  startEye: 'OD' | 'OS';
+  startEye: 'OD' | 'OS' | '';
 }
 
 export async function fillPatientPdfTemplateWithData(

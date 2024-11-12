@@ -37,7 +37,7 @@ export type CreateOrUpdatePatientInput = {
   remainingOD: number;
   remainingOS: number;
   indication: string;
-  startEye: 'OD' | 'OS';
+  startEye: 'OD' | 'OS' | '';
 };
 
 // Função para obter dados de pacientes com suas injeções mais recentes
@@ -364,7 +364,7 @@ export async function updatePatientData(input: {
 }
 
 // Função para ajustar as doses restantes do paciente
-export async function adjustPatientDose(patientId: string, eye: 'OD' | 'OS', adjustment: number): Promise<void> {
+export async function adjustPatientDose(patientId: string, eye: 'OD' | 'OS' | '', adjustment: number): Promise<void> {
   if (eye === 'OD') {
     await prisma.patient.update({
       where: { id: patientId },
