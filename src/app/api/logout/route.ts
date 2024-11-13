@@ -15,7 +15,6 @@ export async function GET(request: Request) {
     expires: new Date(0),
     maxAge: 0,
     sameSite: 'none',
-    domain: 'antivegf.vercel.app',
   });
 
   // Redireciona para a página de login
