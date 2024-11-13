@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     expires: new Date(0),
-    maxAge: 0,
     sameSite: 'none',
   });
+  console.log(request.url);
 
   // Redireciona para a página de login
   const { origin } = new URL(request.url);

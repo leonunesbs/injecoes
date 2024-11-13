@@ -55,7 +55,7 @@ export default function LoginPage() {
       if (response.ok) {
         setLoginSuccess(true); // Exibir feedback de sucesso
         setTimeout(() => {
-          router.replace('/'); // Redireciona para a página inicial após 2 segundos
+          router.push('/'); // Redireciona para a página inicial após 2 segundos
         }, 2000);
       } else {
         setLoginError(true); // Exibir feedback de erro

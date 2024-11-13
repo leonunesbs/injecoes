@@ -1,3 +1,5 @@
+// src/app/api/login/route.ts
+
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -7,7 +9,6 @@ export async function POST(request: Request) {
   if (password === secretPassword) {
     const response = NextResponse.json({ success: true });
 
-    // Definir o cookie com `cookies.set()`
     response.cookies.set('auth', password, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -15,12 +16,7 @@ export async function POST(request: Request) {
       maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias em milissegundos
       sameSite: 'none',
-      domain: 'antivegf.vercel.app',
     });
-
-    // Se precisar definir o cabeçalho Set-Cookie manualmente:
-    const cookieHeader = `auth=${password}; HttpOnly; Secure; Path=/; Max-Age=604800; Expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}; SameSite=None`;
-    response.headers.set('Set-Cookie', cookieHeader);
 
     return response;
   } else {
