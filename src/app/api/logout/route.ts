@@ -14,6 +14,7 @@ export async function GET(request: Request) {
     path: '/',
     expires: new Date(0),
     sameSite: 'none',
+    domain: 'antivegf.vercel.app',
   });
 
   // Redireciona para a página de login
