@@ -35,27 +35,37 @@ export default function LoginPage() {
   });
 
   // Função de envio do formulário
+
   const onSubmit = async (data: FormData) => {
-    setLoading(true);
+    setLoading(true); // Indica que a requisição está sendo feita
     setLoginError(false); // Resetando erro ao tentar novamente
 
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ password: data.password }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({ password: data.password }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Envia o cookie com a requisição
+      });
 
-    setLoading(false);
+      setLoading(false); // Finaliza o carregamento, independentemente do resultado
 
-    if (response.ok) {
-      setLoginSuccess(true); // Exibir feedback de sucesso
-      setTimeout(() => router.push('/'), 2000); // Redireciona após 2 segundos
-    } else {
+      if (response.ok) {
+        setLoginSuccess(true); // Exibir feedback de sucesso
+        setTimeout(() => {
+          router.replace('/'); // Redireciona para a página inicial após 2 segundos
+        }, 2000);
+      } else {
+        setLoginError(true); // Exibir feedback de erro
+        setError('password', { message: 'Senha incorreta. Tente novamente.' });
+      }
+    } catch (error) {
+      setLoading(false); // Finaliza o carregamento em caso de erro
       setLoginError(true); // Exibir feedback de erro
-      setError('password', { message: 'Senha incorreta. Tente novamente.' });
+      console.error('Erro de rede ou servidor:', error);
+      setError('password', { message: 'Erro na comunicação com o servidor. Tente novamente.' });
     }
   };
 
