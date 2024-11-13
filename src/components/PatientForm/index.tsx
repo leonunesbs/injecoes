@@ -2,6 +2,7 @@
 
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AiOutlineLogout } from 'react-icons/ai';
 
@@ -13,11 +14,20 @@ export function PatientForm() {
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [modal, setModal] = useState<HTMLDialogElement | null>(null);
   const [searchModal, setSearchModal] = useState<HTMLDialogElement | null>(null);
+  const router = useRouter();
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToastMessage(message);
     setToastType(type);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/logout', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    router.push('/login');
   };
 
   useEffect(() => {
@@ -63,15 +73,7 @@ export function PatientForm() {
         >
           Buscar Registro
         </button>
-        <button
-          onClick={async () => {
-            await fetch('/api/logout', {
-              method: 'GET',
-              credentials: 'include',
-            });
-          }}
-          className="btn btn-ghost btn-outline flex items-center gap-2 join-item"
-        >
+        <button onClick={handleLogout} className="btn btn-ghost btn-outline flex items-center gap-2 join-item">
           <AiOutlineLogout size={18} />
           Sair
         </button>
