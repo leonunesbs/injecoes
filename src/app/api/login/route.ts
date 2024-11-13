@@ -1,5 +1,4 @@
-// src/app/api/login/route.ts
-
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -7,9 +6,8 @@ export async function POST(request: Request) {
   const secretPassword = process.env.SECRET_PASSWORD;
 
   if (password === secretPassword) {
-    const response = NextResponse.json({ success: true });
-
-    response.cookies.set('auth', password, {
+    const cookieStore = cookies();
+    cookieStore.set('auth', password, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
@@ -18,8 +16,7 @@ export async function POST(request: Request) {
       sameSite: 'strict',
       domain: 'antivegf.vercel.app',
     });
-
-    return response;
+    return NextResponse.json({ success: true });
   } else {
     return NextResponse.json({ success: false }, { status: 401 });
   }
