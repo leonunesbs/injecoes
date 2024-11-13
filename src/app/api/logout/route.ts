@@ -12,8 +12,6 @@ export async function GET(request: Request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    sameSite: 'none',
-    domain: 'antivegf.vercel.app',
     maxAge: 0,
   });
 
