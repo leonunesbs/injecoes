@@ -9,7 +9,6 @@ export async function POST(request: Request) {
   if (password === secretPassword) {
     const response = NextResponse.json({ success: true });
 
-    // Define o cookie 'auth' com a senha
     response.cookies.set('auth', password, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -17,6 +16,7 @@ export async function POST(request: Request) {
       maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias em milissegundos
       sameSite: 'strict',
+      domain: 'antivegf.vercel.app',
     });
 
     return response;
