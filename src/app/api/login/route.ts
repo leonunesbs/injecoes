@@ -1,4 +1,5 @@
-import { cookies } from 'next/headers';
+// src/app/api/login/route.ts
+
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -6,14 +7,19 @@ export async function POST(request: Request) {
   const secretPassword = process.env.SECRET_PASSWORD;
 
   if (password === secretPassword) {
-    const cookieStore = cookies();
-    cookieStore.set('auth', password, {
+    const response = NextResponse.json({ success: true });
+
+    // Define o cookie 'auth' com a senha
+    response.cookies.set('auth', password, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
-      sameSite: 'none',
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias em milissegundos
+      sameSite: 'strict',
     });
-    return NextResponse.json({ success: true });
+
+    return response;
   } else {
     return NextResponse.json({ success: false }, { status: 401 });
   }
