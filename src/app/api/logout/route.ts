@@ -12,7 +12,9 @@ export async function GET(request: Request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    expires: new Date(0), // Expira o cookie imediatamente
+    expires: new Date(0),
+    domain: 'antivegf.vercel.app',
+    sameSite: 'none',
   });
 
   // Redireciona para a página de login
