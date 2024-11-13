@@ -7,12 +7,11 @@ export async function GET(request: Request) {
   // Obtém o gerenciador de cookies
   const cookieStore = cookies();
 
-  // Remove o cookie 'auth' definindo-o com uma data de expiração no passado
-  cookieStore.set('auth', '', {
+  cookieStore.delete({
+    name: 'auth',
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    expires: new Date(0),
     sameSite: 'none',
     domain: '.antivegf.vercel.app',
   });
