@@ -13,8 +13,7 @@ export async function GET(request: Request) {
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     expires: new Date(0),
-    sameSite: 'strict',
-    domain: 'antivegf.vercel.app',
+    sameSite: 'lax',
   });
 
   // Redireciona para a página de login
