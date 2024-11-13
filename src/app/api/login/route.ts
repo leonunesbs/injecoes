@@ -10,10 +10,13 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ success: true });
 
     response.cookies.set('auth', password, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias em milissegundos
       sameSite: 'none',
+      domain: 'antivegf.vercel.app',
     });
 
     return response;
