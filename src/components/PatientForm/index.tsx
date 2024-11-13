@@ -3,6 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AiOutlineLogout } from 'react-icons/ai';
 
 import { CreateOrUpdatePatientModal } from './CreateOrUpdatePatientModal';
 import { SearchPatientModal } from './SearchForm/SearchPatientModal';
@@ -61,6 +62,18 @@ export function PatientForm() {
           aria-haspopup="dialog"
         >
           Buscar Registro
+        </button>
+        <button
+          onClick={async () => {
+            await fetch('/api/logout', {
+              method: 'GET',
+              credentials: 'include',
+            });
+          }}
+          className="btn btn-ghost btn-outline flex items-center gap-2 join-item"
+        >
+          <AiOutlineLogout size={18} />
+          Sair
         </button>
       </div>
       {/* Modais */}
