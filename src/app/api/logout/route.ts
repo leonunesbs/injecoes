@@ -8,11 +8,11 @@ export async function GET(request: Request) {
   const cookieStore = cookies();
 
   // Remove o cookie 'auth' definindo-o com uma data de expiração no passado
-  cookieStore.delete({
-    name: 'auth',
+  cookieStore.set('auth', '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
+    expires: new Date(0),
     maxAge: 0,
     sameSite: 'none',
     domain: 'antivegf.vercel.app',
