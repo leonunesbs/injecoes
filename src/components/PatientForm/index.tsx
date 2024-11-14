@@ -74,11 +74,11 @@ export function PatientForm() {
           aria-haspopup="dialog"
         >
           <AiOutlineSearch size={20} />
-          Buscar Paciente
+          <span className="hidden sm:block">Buscar Paciente</span>
         </button>
         <button onClick={handleLogout} className="btn btn-ghost  flex items-center gap-2 join-item">
           <AiOutlineLogout size={18} />
-          Sair
+          <span className="hidden sm:block">Sair</span>
         </button>
       </div>
       {/* Modais */}
