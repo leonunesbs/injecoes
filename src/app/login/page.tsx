@@ -7,7 +7,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AiOutlineCheckCircle, AiOutlineCloseCircle, AiOutlineLoading3Quarters, AiOutlineLock } from 'react-icons/ai';
+import {
+  AiOutlineCheckCircle,
+  AiOutlineCloseCircle,
+  AiOutlineLoading3Quarters,
+  AiOutlineLock,
+  AiOutlineLogin,
+} from 'react-icons/ai';
 import { z } from 'zod';
 
 // Schema de validação com Zod
@@ -77,7 +83,7 @@ export default function LoginPage() {
             <Image alt="AntiVEGF Logo" src={'/logo.jpg'} width={100} height={100} priority quality={80} />
           </div>
         </div>
-        <h1 className="text-2xl font-extrabold text-center text-primary mb-6">Acesso Protegido</h1>
+        <h1 className="text-2xl font-extrabold text-center mb-6">Acesso Protegido</h1>
         <p className="text-center text-gray-500 mb-6">Insira a senha para continuar</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="form-control">
@@ -120,7 +126,7 @@ export default function LoginPage() {
               loading ? 'btn-disabled' : ''
             } flex items-center justify-center gap-2`}
           >
-            {loading && <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" />}
+            {loading ? <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" /> : <AiOutlineLogin size={20} />}
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>

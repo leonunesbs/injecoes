@@ -4,7 +4,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { AiOutlineLogout } from 'react-icons/ai';
+import { AiOutlineLogout, AiOutlineSearch } from 'react-icons/ai';
+import { FaSyringe } from 'react-icons/fa6';
 
 import { CreateOrUpdatePatientModal } from './CreateOrUpdatePatientModal';
 import { SearchPatientModal } from './SearchForm/SearchPatientModal';
@@ -55,25 +56,27 @@ export function PatientForm() {
       )}
       <div className="join">
         <button
-          className="btn btn-primary btn-outline join-item"
+          className="btn btn-primary join-item"
           onClick={() => {
             modal?.showModal();
           }}
           aria-haspopup="dialog"
         >
-          Novo Registro
+          <FaSyringe size={16} />
+          Nova Indicação
         </button>
 
         <button
-          className="btn btn-secondary btn-outline join-item"
+          className="btn btn-ghost join-item"
           onClick={() => {
             searchModal?.showModal();
           }}
           aria-haspopup="dialog"
         >
-          Buscar Registro
+          <AiOutlineSearch size={20} />
+          Buscar Paciente
         </button>
-        <button onClick={handleLogout} className="btn btn-ghost btn-outline flex items-center gap-2 join-item">
+        <button onClick={handleLogout} className="btn btn-ghost  flex items-center gap-2 join-item">
           <AiOutlineLogout size={18} />
           Sair
         </button>

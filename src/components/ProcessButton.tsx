@@ -62,11 +62,11 @@ export function ProcessButton({ loading, url, onNewReport, openButtonRef }: Proc
           {/* Botão de início para processar os dados */}
           <button
             type="submit"
-            className="btn btn-primary w-full flex items-center justify-center"
+            className="btn btn-ghost w-full flex items-center justify-center"
             aria-label="Iniciar processamento dos dados"
           >
             <FaBolt className="h-5 w-5 mr-2" aria-hidden="true" />
-            Iniciar
+            Processar
           </button>
         </>
       )}
@@ -74,7 +74,7 @@ export function ProcessButton({ loading, url, onNewReport, openButtonRef }: Proc
       {/* Link de ajuda */}
       <Link
         href={'/pop'}
-        className="btn btn-ghost w-full flex items-center justify-center"
+        className="btn btn-ghost  w-full flex items-center justify-center"
         aria-label="Obter ajuda sobre como usar o sistema"
       >
         <FaCircleInfo className="h-5 w-5 mr-2" aria-hidden="true" />
