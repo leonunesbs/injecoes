@@ -18,11 +18,11 @@ export const metadata: Metadata = {
     title: 'POP - Procedimento Operacional Padrão para Injeções Intravítreas',
     description:
       'Guia detalhado dos procedimentos para injeções intravítreas no Setor de Oftalmologia do Hospital Geral de Fortaleza (HGF).',
-    url: 'https://antivegf.vercel.app/pop',
+    url: 'https://antivegf.seoft.com.br/pop',
     siteName: 'POP - Setor de Oftalmologia HGF',
     images: [
       {
-        url: 'https://antivegf.vercel.app/pop-logo.jpg',
+        url: 'https://antivegf.seoft.com.br/pop-logo.jpg',
         width: 1200,
         height: 630,
         alt: 'POP - Injeções Intravítreas',
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: 'https://antivegf.vercel.app/pop',
+    canonical: 'https://antivegf.seoft.com.br/pop',
     languages: {
-      'pt-BR': 'https://antivegf.vercel.app/pop',
+      'pt-BR': 'https://antivegf.seoft.com.br/pop',
     },
   },
 };

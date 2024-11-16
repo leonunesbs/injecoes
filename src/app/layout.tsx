@@ -36,11 +36,11 @@ export const metadata: Metadata = {
     title: 'AntiVEGF - Plataforma Médica para Relatórios de Injeções',
     description:
       'Plataforma restrita ao HGF para auxílio em relatórios de injeções intravítreas para médicos residentes.',
-    url: 'https://antivegf.vercel.app',
+    url: 'https://antivegf.seoft.com.br',
     siteName: 'AntiVEGF - Plataforma para Residentes',
     images: [
       {
-        url: 'https://antivegf.vercel.app/logo.jpg',
+        url: 'https://antivegf.seoft.com.br/logo.jpg',
         width: 1200,
         height: 630,
         alt: 'AntiVEGF - Relatórios Médicos para Residentes',
@@ -56,15 +56,15 @@ export const metadata: Metadata = {
     description: 'Plataforma médica do HGF para organizar relatórios de injeções intravítreas.',
     images: [
       {
-        url: 'https://antivegf.vercel.app/logo.jpg',
+        url: 'https://antivegf.seoft.com.br/logo.jpg',
         alt: 'AntiVEGF - Plataforma Médica',
       },
     ],
   },
   alternates: {
-    canonical: 'https://antivegf.vercel.app',
+    canonical: 'https://antivegf.seoft.com.br',
     languages: {
-      'pt-BR': 'https://antivegf.vercel.app',
+      'pt-BR': 'https://antivegf.seoft.com.br',
     },
   },
   icons: {
