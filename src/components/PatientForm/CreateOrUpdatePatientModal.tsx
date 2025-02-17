@@ -65,9 +65,11 @@ export function CreateOrUpdatePatientModal({ modal, showToast }: CreateOrUpdateP
         data.swalisClassification === 'Outros' ? data.swalisOther || '' : data.swalisClassification;
 
       const remainingOD =
+        // eslint-disable-next-line prettier/prettier
         data.remainingODOption === 'Outro' ? data.remainingODCustom ?? 0 : parseInt(data.remainingODOption, 10);
 
       const remainingOS =
+        // eslint-disable-next-line prettier/prettier
         data.remainingOSOption === 'Outro' ? data.remainingOSCustom ?? 0 : parseInt(data.remainingOSOption, 10);
 
       const patientData = {
