@@ -17,6 +17,7 @@ interface MainFormProps {
 
 type Inputs = {
   uploadedData: FileList;
+  pdfModel: string;
 };
 
 export type MainFormData = {
@@ -32,13 +33,18 @@ export type MainFormData = {
 };
 
 export function MainForm({}: MainFormProps) {
-  const { register, handleSubmit, reset } = useForm<Inputs>();
+  const { register, handleSubmit, reset } = useForm<Inputs>({
+    defaultValues: {
+      pdfModel: 'modelo-ofta.pdf',
+    },
+  });
   const [blobUrl, setBlobUrl] = useState<string | undefined>();
   const [processedData, setProcessedData] = useState<MainFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [staffName, setStaffName] = useState('');
   const [treatmentType, setTreatmentType] = useState('');
+  const [selectedPdfModel, setSelectedPdfModel] = useState('modelo-ofta.pdf');
   const modalRef = useRef<HTMLDialogElement>(null);
   const confirmModalRef = useRef<HTMLDialogElement>(null);
   const openButtonRef = useRef<HTMLButtonElement>(null);
@@ -74,9 +80,11 @@ export function MainForm({}: MainFormProps) {
   /**
    * Função chamada ao submeter o formulário.
    * @param uploadedData - Arquivos carregados pelo usuário
+   * @param pdfModel - Modelo de PDF selecionado
    */
-  const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData }) => {
+  const onSubmit: SubmitHandler<Inputs> = async ({ uploadedData, pdfModel }) => {
     setLoading(true);
+    setSelectedPdfModel(pdfModel);
     try {
       const data = await processFiles(uploadedData);
 
@@ -103,7 +111,7 @@ export function MainForm({}: MainFormProps) {
    * @param processedData - Dados processados dos pacientes
    */
   const sortAndSavePdf = async (processedData: MainFormData[]): Promise<Uint8Array> => {
-    const modelPDFBytes = await fetch('/modelo.pdf').then((res) => res.arrayBuffer());
+    const modelPDFBytes = await fetch(`/${selectedPdfModel}`).then((res) => res.arrayBuffer());
     const pdfDoc = await createPdfFromData(processedData, modelPDFBytes);
     const sortedPdf = await sortPdfPages(pdfDoc);
     return sortedPdf.save();
@@ -159,6 +167,7 @@ export function MainForm({}: MainFormProps) {
     setLoading(false);
     setStaffName('');
     setTreatmentType('');
+    setSelectedPdfModel('modelo-ofta.pdf');
     reset();
   };
   const handleNewReport = () => {
@@ -189,6 +198,26 @@ export function MainForm({}: MainFormProps) {
           />
           <small id="fileHelp" className="text-gray-500">
             Selecione o arquivo contendo os dados dos pacientes.
+          </small>
+        </div>
+
+        <div className="form-control">
+          <label htmlFor="pdfModel" className="label label-text font-semibold">
+            Modelo de PDF:
+          </label>
+          <select
+            {...register('pdfModel')}
+            id="pdfModel"
+            className="select select-bordered w-full"
+            required
+            aria-required="true"
+          >
+            <option value="modelo-ofta.pdf">Modelo Ofta</option>
+            <option value="modelo-cristalia.pdf">Modelo Cristalia</option>
+            <option value="modelo-generico.pdf">Modelo Genérico</option>
+          </select>
+          <small id="pdfModelHelp" className="text-gray-500">
+            Selecione o modelo de PDF que será utilizado para gerar o relatório.
           </small>
         </div>
         <ProcessButton
